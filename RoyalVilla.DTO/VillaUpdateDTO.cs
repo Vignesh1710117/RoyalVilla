@@ -1,0 +1,22 @@
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations;
+using System.Data;
+
+namespace RoyalVilla.DTO
+{
+    public class VillaUpdateDTO
+    {
+        [Required]
+        public int Id { get; set; }
+        [MaxLength(50)] //custom
+        [Required]
+        public required string Name { get; set; }
+        public string? Details { get; set; }
+        public double Rate { get; set; }
+        public int Sqft { get; set; }
+        public int Occupancy { get; set; }
+        public string? ImageUrl { get; set; }
+        public IFormFile? Image { get; set; }
+
+    }
+}

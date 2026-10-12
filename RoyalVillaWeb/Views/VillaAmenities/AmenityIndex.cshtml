@@ -1,0 +1,119 @@
+﻿```cshtml
+@model RoyalVilla.DTO.VillaDTO
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container py-5">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li class="breadcrumb-item">Villas</li>
+            <li class="breadcrumb-item active">@Model.Name</li>
+        </ol>
+    </nav>
+
+    <div class="row g-5">
+
+        <!-- Villa Image -->
+        <div class="col-lg-6">
+            <div class="rounded-4 overflow-hidden shadow-sm">
+                <img src="@Model.ImageUrl"
+                     alt="@Model.Name"
+                     class="img-fluid w-100"
+                     style="height: 420px; object-fit: cover;" />
+            </div>
+        </div>
+
+        <!-- Villa Information -->
+        <div class="col-lg-6">
+
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h1 class="fw-bold">@Model.Name</h1>
+            </div>
+
+            <p class="text-secondary mb-4">
+                <i class="bi bi-geo-alt"></i>
+                @Model.Occupancy Guests
+            </p>
+
+            <p class="text-secondary">
+                @Model.Details
+            </p>
+
+            <hr class="my-4" />
+
+            <!-- Villa Statistics -->
+            <div class="row text-center g-3 mb-4">
+                <div class="col-4">
+                    <i class="bi bi-people fs-4"></i>
+                    <p class="fw-semibold mb-0">@Model.Occupancy</p>
+                    <small class="text-secondary">Guests</small>
+                </div>
+
+                <div class="col-4">
+                    <i class="bi bi-rulers fs-4"></i>
+                    <p class="fw-semibold mb-0">@Model.Sqft</p>
+                    <small class="text-secondary">Sq. Ft.</small>
+                </div>
+
+                <div class="col-4">
+                    <i class="bi bi-currency-rupee fs-4"></i>
+                    <p class="fw-semibold mb-0">
+                        @Model.Rate.ToString("C")
+                    </p>
+                    <small class="text-secondary">Per Night</small>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Amenities -->
+            <h4 class="fw-bold mb-3">Amenities</h4>
+
+            @if (Model.VillaAmenities != null &&
+                 Model.VillaAmenities.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var villaAmenity in Model.VillaAmenities)
+                    {
+                        <div class="col-sm-6">
+                            <div class="border rounded-3 p-3 h-100">
+                                <i class="bi bi-check-circle text-success me-2"></i>
+                                @villaAmenity.Amenity.Name
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-secondary">
+                    No amenities available for this villa.
+                </p>
+            }
+
+            <hr class="my-4" />
+
+            <!-- Description -->
+            <h4 class="fw-bold mb-3">About this Villa</h4>
+            <p class="text-secondary">
+                @Model.Details
+            </p>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-outline-dark mt-3">
+                <i class="bi bi-arrow-left me-2"></i>
+                Back to Villas
+            </a>
+
+        </div>
+    </div>
+</div>
+```
