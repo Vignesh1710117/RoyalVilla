@@ -154,6 +154,14 @@
 
                                 <!-- Action Buttons -->
                                 <div class="d-grid gap-2">
+
+                                    <a asp-controller="VillaAmenities"
+                                       asp-action="Details"
+                                       asp-route-id="@villa.Id"
+                                       class="btn btn-outline-primary">
+                                        <i class="bi bi-info-circle"></i> View Details
+                                    </a>
+
                                     <a href="mailto:vignesh@gmail.com"
                                        class="btn btn-primary btn-hover">
                                         <i class="bi bi-envelope"></i> Contact Us

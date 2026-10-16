@@ -1,0 +1,60 @@
+﻿@model RoyalVillaWeb.ViewModels.VillaDetailsViewModel
+@using RoyalVillaWeb
+
+@{
+    ViewData["Title"] = "Villa Details";
+}
+
+<div class="container mt-4">
+    <h2>@Model.Villa.Name</h2>
+
+    <div class="row mt-3">
+        <div class="col-md-6">
+            <img src="@SD.getImageURL(Model.Villa.ImageUrl)"
+                 alt="@Model.Villa.Name"
+                 class="img-fluid rounded"
+                 style="max-height: 350px; object-fit: cover;" />
+        </div>
+
+        <div class="col-md-6">
+            <h4>Villa Information</h4>
+
+            <p><strong>Villa ID:</strong> @Model.Villa.Id</p>
+            <p><strong>Description:</strong> @Model.Villa.Details</p>
+            <p><strong>Price:</strong> @Model.Villa.Rate</p>
+            <p><strong>Area:</strong> @Model.Villa.Sqft sq.ft.</p>
+            <p><strong>Occupancy:</strong> @Model.Villa.Occupancy</p>
+        </div>
+    </div>
+
+    <hr />
+
+    <h3>Amenities</h3>
+
+    @if (Model.Amenities.Any())
+    {
+        <div class="row">
+            @foreach (var amenity in Model.Amenities)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@amenity.Name</h5>
+                            <p class="card-text">
+                                @(amenity.Description ?? "No description available")
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No amenities available for this villa.</p>
+    }
+
+    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-3">
+        Back to Villas
+    </a>
+</div>

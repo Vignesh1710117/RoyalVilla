@@ -2,33 +2,46 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RoyalVilla.DTO;
+using RoyalVillaWeb.Services;
 using RoyalVillaWeb.Services.IService;
+using RoyalVillaWeb.ViewModels;
 
 namespace RoyalVillaWeb.Controllers
 {
     public class VillaAmenitiesController : Controller
     {
         private readonly IVillaAmenitiesService _VillaAmenitiesService;
+        private readonly IVillaService _villaService;
         private readonly IMapper _mapper;
-        public VillaAmenitiesController(IMapper mapper, IVillaAmenitiesService villaAmenitiesService)
+        public VillaAmenitiesController(IMapper mapper, IVillaAmenitiesService villaAmenitiesService, IVillaService villaService)
         {
             _VillaAmenitiesService = villaAmenitiesService;
             _mapper = mapper;
+            _villaService = villaService;
         }
 
-        // GET: VillaAmenitiesController/Details/5
+        // GET: Villa-amenities/villa/
         public async Task<IActionResult> Details(int id)
         {
-            List<VillaAmentiesDTO> villaAmentiesDTOs = null;
+            //List<VillaAmentiesDTO> villaAmenties = new ();
             try
             {
-                var response = await _VillaAmenitiesService.GetAmenityAsync<ApiResponse<List<VillaAmentiesDTO>>>(id);
+                var villaResponse = await _villaService.GetAsync<ApiResponse<VillaDTO>>(id);
 
-                if (response != null)
+                if (villaResponse?.Data == null)
                 {
-                    villaAmentiesDTOs = response.Data;
-                    return View(villaAmentiesDTOs);
+                    return View("~/Views/Shared/NotFound.cshtml");
                 }
+
+                var amenitiesResponse = await _VillaAmenitiesService.GetAmenityAsync<ApiResponse<List<VillaAmentiesDTO>>>(id);
+
+                var model = new VillaDetailsViewModel
+                {
+                    Villa = villaResponse.Data,
+                    Amenities = amenitiesResponse?.Data ?? new List<VillaAmentiesDTO>()
+                };
+
+                return View(model);
             }
             catch (Exception ex)
             {

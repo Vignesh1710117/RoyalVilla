@@ -180,5 +180,42 @@ namespace RoyalVilla_API.Controllers.v2
                 return StatusCode(500, errorResponse);
             }
         }
+
+
+        [HttpGet("villa/{id:int}")]
+
+        [ProducesResponseType(typeof(ApiResponse<VillaAmentiesDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ApiResponse<List<VillaAmentiesDTO>>>> GetVillasAmenitiesById(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                {
+                    return NotFound(ApiResponse<object>.NotFound("Villa ID must be greater than 0"));
+                }
+                var villaExist = await _db.Villa.AnyAsync(u => u.Id.Equals(id));
+                if (!villaExist)
+                {
+                    return NotFound(ApiResponse<object>.NotFound("Villa doesn't exist"));
+                }
+                var listOfAmenities = await _db.VillaAmenities.Include(x => x.villa).Where(u => u.VillaId == id).ToListAsync();
+
+
+
+                if (!listOfAmenities.Any())
+                {
+                    return Ok(ApiResponse<List<VillaAmentiesDTO>>.Ok(_mapper.Map<List<VillaAmentiesDTO>>(listOfAmenities), "No amenities found"));
+                }
+
+                return Ok(ApiResponse<List<VillaAmentiesDTO>>.Ok(_mapper.Map<List<VillaAmentiesDTO>>(listOfAmenities), "Records retrieved successfully"));
+            }
+            catch (Exception ex)
+            {
+                var errorResponse = ApiResponse<object>.Error(500, "An error occurred while creating the villa:", ex.Message);
+                return StatusCode(500, errorResponse);
+            }
+        }
     }
 }

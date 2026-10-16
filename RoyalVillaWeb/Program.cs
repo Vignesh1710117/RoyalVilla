@@ -32,6 +32,14 @@ var builder = WebApplication.CreateBuilder(args);
         option.AccessDeniedPath = "/auth/accessdenied";
     });
 
+//
+
+//
+
+//
+
+//
+
     SD.ApiBaseURL = builder.Configuration.GetValue<string>("ServiceUrls:VillaAPI");
     builder.Services.AddHttpClient("RoyalVillaAPI", client =>
     {
@@ -39,10 +47,19 @@ var builder = WebApplication.CreateBuilder(args);
         client.BaseAddress = new Uri(VillaURI);
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     });
-    
+//
+
+
+//
+
+
+//
+
+//
     builder.Services.AddScoped<IVillaService, VillaService>();
     builder.Services.AddScoped<ITokenProvider, TokenProvider>();
     builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<IVillaAmenitiesService, VillaAmenitiesService>();
     //builder.Services.AddAuthorization();
     var app = builder.Build();
     
