@@ -7,7 +7,7 @@ namespace RoyalVillaWeb.Services
     public class VillaAmenitiesService : BaseService, IVillaAmenitiesService
     {
 
-        private const string APIEndpoint = $"/api/{SD.CurrentApiVersion}/Villa-amenities";  
+        private const string APIEndpoint = $"/api/{SD.CurrentApiVersion}/Villa-amenities/villa/";  
 
         public VillaAmenitiesService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
             : base(httpClientFactory, tokenProvider, httpContextAccessor)

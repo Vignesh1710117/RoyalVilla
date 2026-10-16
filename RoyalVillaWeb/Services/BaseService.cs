@@ -51,6 +51,10 @@ namespace RoyalVillaWeb.Services
                 }
             }
         }
+        //
+        //
+        //
+        //
 
         public async Task<T?> SendAsync<T>(ApiRequest apiRequest, bool withBearer =true)
         {
@@ -89,6 +93,42 @@ namespace RoyalVillaWeb.Services
             return await apiResponse.Content.ReadFromJsonAsync<T>( );
         }
 
+        private HttpRequestMessage CreateRequestMessage(ApiRequest apiRequest, bool withBearer)
+        {
+
+
+            var message = new HttpRequestMessage
+            {
+                RequestUri = new Uri(apiRequest.Url, UriKind.Relative),
+                Method = GetHttpMethod(apiRequest.ApiType)
+            };
+
+            var token = _tokenProvider.GetAccessToken();
+
+            if (withBearer && !string.IsNullOrEmpty(token))
+            {
+                message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            if (apiRequest.Data != null)
+            {
+                if (apiRequest.Data is MultipartContent multipartcontent)
+                {
+                    message.Content = multipartcontent;
+                }
+                else
+                {
+                    message.Content = JsonContent.Create(apiRequest.Data, options: JsonOptions);
+                }
+
+            }
+            return message;
+        }
+
+        //
+        //
+        //
+        //
         private async Task<bool> RefreshAccesssTokenAsync()
         {
             try
@@ -163,37 +203,6 @@ namespace RoyalVillaWeb.Services
             }
         }
 
-        private HttpRequestMessage CreateRequestMessage(ApiRequest apiRequest, bool withBearer)
-        {
-            
-
-            var message = new HttpRequestMessage
-            {
-                RequestUri = new Uri(apiRequest.Url, UriKind.Relative),
-                Method = GetHttpMethod(apiRequest.ApiType)
-            };
-
-            var token = _tokenProvider.GetAccessToken();
-
-            if (withBearer && !string.IsNullOrEmpty(token))
-            {
-                message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            }
-
-            if (apiRequest.Data != null)
-            {
-                if (apiRequest.Data is MultipartContent multipartcontent)
-                {
-                    message.Content = multipartcontent;
-                }
-                else
-                {
-                    message.Content = JsonContent.Create(apiRequest.Data, options: JsonOptions);
-                }
-
-            }
-            return message;
-        }
 
 
         private static HttpMethod GetHttpMethod(ApiType apiType)
