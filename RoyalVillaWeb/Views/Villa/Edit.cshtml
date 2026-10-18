@@ -1,90 +1,408 @@
 ﻿@model RoyalVilla.DTO.VillaUpdateDTO
+@using RoyalVillaWeb
 
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+@{
+    ViewData["Title"] = "Update Villa";
+}
 
-            <!-- Form Card -->
-            <div class="card">
-                <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold h4 pt-1">Update Villa</span>
-                </div>
-                <div class="card-body">
-                    <form method="post" enctype="multipart/form-data" >
-                        <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="ImageUrl" />
-                        <!-- Villa Name -->
-                        <div class="mb-3">
-                            <label asp-for="Name" class="form-label">
-                                Villa Name <span class="text-danger">*</span>
-                            </label>
-                            <input asp-for="Name" class="form-control" placeholder="Enter villa name" />
-                            <span asp-validation-for="Name" class="text-danger small"></span>
+<style>
+    .villa-edit-page {
+        background: #f5f6f2;
+        min-height: 100vh;
+        padding: 42px 0 60px;
+        color: #263b2e;
+    }
+
+    .edit-eyebrow {
+        color: #718474;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .edit-title {
+        color: #243d2e;
+        font-size: clamp(2rem, 4vw, 2.55rem);
+        font-weight: 750;
+        letter-spacing: -1px;
+    }
+
+    .edit-subtitle {
+        color: #818a81;
+    }
+
+    .edit-card {
+        background: #fff;
+        border: 1px solid #e6ebe4;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 12px 35px rgba(35, 56, 42, .055);
+    }
+
+    .edit-card-header {
+        background: #294b37;
+        color: #fff;
+        padding: 22px 28px;
+    }
+
+        .edit-card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    .edit-card-body {
+        padding: clamp(22px, 4vw, 36px);
+    }
+
+    .edit-section-label {
+        color: #708273;
+        font-size: .73rem;
+        font-weight: 750;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+    }
+
+    .villa-edit-page .form-label {
+        color: #394a3e;
+        font-size: .88rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .villa-edit-page .form-control {
+        border: 1px solid #dfe5dc;
+        background: #fbfcfa;
+        border-radius: 10px;
+        min-height: 46px;
+        padding: 11px 13px;
+        color: #263b2e;
+    }
+
+    .villa-edit-page textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .villa-edit-page .form-control:focus {
+        border-color: #557c61;
+        box-shadow: 0 0 0 .2rem rgba(64, 111, 78, .12);
+        background: #fff;
+    }
+
+    .villa-edit-page .input-group-text {
+        background: #edf3eb;
+        border-color: #dfe5dc;
+        color: #31563c;
+        border-radius: 10px 0 0 10px;
+        font-weight: 650;
+    }
+
+    .villa-edit-page .input-group .form-control {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .edit-divider {
+        border: 0;
+        border-top: 1px solid #edf0eb;
+        margin: 27px 0;
+    }
+
+    .current-image-card {
+        background: #f6f8f4;
+        border: 1px solid #e7ebe4;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .current-image {
+        width: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .image-preview {
+        background: #f6f8f4;
+        border: 1px dashed #cbd7c9;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .edit-help {
+        color: #858e85;
+        font-size: .82rem;
+    }
+
+    .btn-save-villa {
+        background: #294b37;
+        color: #fff;
+        border: 1px solid #294b37;
+        border-radius: 10px;
+        padding: 12px 21px;
+        font-weight: 650;
+    }
+
+        .btn-save-villa:hover {
+            background: #1d3828;
+            border-color: #1d3828;
+            color: #fff;
+        }
+
+    .btn-cancel-villa {
+        background: #fff;
+        color: #42594a;
+        border: 1px solid #dce3da;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 600;
+    }
+
+        .btn-cancel-villa:hover {
+            background: #f3f6f1;
+            color: #263d2e;
+        }
+
+    @@media (max-width: 575px) {
+        .villa-edit-page {
+            padding-top: 28px;
+        }
+
+        .edit-card-header,
+        .edit-card-body {
+            padding: 21px;
+        }
+    }
+</style>
+
+<div class="villa-edit-page">
+    <div class="container">
+
+        <!-- Page heading -->
+        <div class="mb-4 mb-lg-5">
+            <div class="edit-eyebrow mb-2">
+                ROYALVILLA · PROPERTY MANAGEMENT
+            </div>
+
+            <h1 class="edit-title mb-2">
+                Update Villa
+            </h1>
+
+            <p class="edit-subtitle mb-0">
+                Keep your property information accurate and up to date.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+
+                <div class="edit-card">
+
+                    <div class="edit-card-header d-flex
+                        align-items-center gap-3">
+                        <i class="bi bi-house-gear fs-4"></i>
+
+                        <div>
+                            <h2>Edit property details</h2>
+                            <small class="text-white-50">
+                                Update the information shown to guests.
+                            </small>
                         </div>
-                        <!-- Details -->
-                        <div class="mb-3">
-                            <label asp-for="Details" class="form-label">Description</label>
-                            <textarea asp-for="Details" class="form-control" rows="4"
-                                      placeholder="Describe the villa"></textarea>
-                            <span asp-validation-for="Details" class="text-danger small"></span>
-                        </div>
-                        <!-- Rate and Occupancy -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Rate" class="form-label">
-                                    Nightly Rate <span class="text-danger">*</span>
+                    </div>
+
+                    <div class="edit-card-body">
+
+                        <form method="post" enctype="multipart/form-data">
+
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="ImageUrl" />
+
+                            <div class="edit-section-label">
+                                01 &nbsp; Basic information
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Name" class="form-label">
+                                    Villa Name <span class="text-danger">*</span>
                                 </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input asp-for="Rate" type="number" step="0.01" class="form-control" placeholder="0.00" />
+
+                                <input asp-for="Name"
+                                       class="form-control"
+                                       placeholder="Enter villa name" />
+
+                                <span asp-validation-for="Name"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Details" class="form-label">
+                                    Description
+                                </label>
+
+                                <textarea asp-for="Details"
+                                          class="form-control"
+                                          rows="4"
+                                          placeholder="Describe the villa, its features and surroundings"></textarea>
+
+                                <span asp-validation-for="Details"
+                                      class="text-danger small"></span>
+                            </div>
+
+                            <hr class="edit-divider" />
+
+                            <div class="edit-section-label">
+                                02 &nbsp; Pricing and capacity
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Rate" class="form-label">
+                                        Nightly Rate <span class="text-danger">*</span>
+                                    </label>
+
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+
+                                        <input asp-for="Rate"
+                                               type="number"
+                                               step="0.01"
+                                               min="0"
+                                               class="form-control"
+                                               placeholder="0.00" />
+                                    </div>
+
+                                    <span asp-validation-for="Rate"
+                                          class="text-danger small"></span>
                                 </div>
-                                <span asp-validation-for="Rate" class="text-danger small"></span>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Occupancy"
+                                           class="form-label">
+                                        Maximum Occupancy
+                                    </label>
+
+                                    <input asp-for="Occupancy"
+                                           type="number"
+                                           min="1"
+                                           class="form-control"
+                                           placeholder="Number of guests" />
+
+                                    <span asp-validation-for="Occupancy"
+                                          class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Sqft" class="form-label">
+                                        Property Area
+                                    </label>
+
+                                    <div class="input-group">
+                                        <input asp-for="Sqft"
+                                               type="number"
+                                               min="0"
+                                               class="form-control"
+                                               placeholder="Enter area" />
+
+                                        <span class="input-group-text">
+                                            sq.ft.
+                                        </span>
+                                    </div>
+
+                                    <span asp-validation-for="Sqft"
+                                          class="text-danger small"></span>
+                                </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Occupancy" class="form-label">Max Occupancy</label>
-                                <input asp-for="Occupancy" type="number" class="form-control" placeholder="Number of guests" />
-                                <span asp-validation-for="Occupancy" class="text-danger small"></span>
+
+                            <hr class="edit-divider" />
+
+                            <div class="edit-section-label">
+                                03 &nbsp; Property image
                             </div>
-                        </div>
 
-                        <!-- Sqft -->
-                        <div class="mb-3">
-                            <label asp-for="Sqft" class="form-label">Square Feet</label>
-                            <input asp-for="Sqft" type="number" class="form-control" placeholder="Area in sqft" />
-                            <span asp-validation-for="Sqft" class="text-danger small"></span>
-                        </div>
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <div class="current-image-card mb-4">
+                                    <div class="d-flex justify-content-between
+                                        align-items-center mb-3">
+                                        <span class="fw-semibold">
+                                            Current image
+                                        </span>
 
-                       
+                                        <span class="badge rounded-pill
+                                            text-bg-light">
+                                            Existing photo
+                                        </span>
+                                    </div>
 
-                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                        {
-                            <div class="text-center mb-4">
-                                <label> Current Image</label> <br/>
-                                <img src="@SD.getImageURL(Model.ImageUrl)" alt="@Model.Name" class="img-fluid rounded" style="max-height: 350px;">
+                                    <img src="@SD.getImageURL(Model.ImageUrl)"
+                                         alt="@Model.Name"
+                                         class="current-image" />
+                                </div>
+                            }
+
+                            <div class="mb-3">
+                                <label asp-for="Image" class="form-label">
+                                    Upload New Image
+                                </label>
+
+                                <input asp-for="Image"
+                                       type="file"
+                                       class="form-control"
+                                       accept="image/jpeg,image/png"
+                                       onchange="previewImage(this)" />
+
+                                <span asp-validation-for="Image"
+                                      class="text-danger small"></span>
+
+                                <div class="edit-help mt-2">
+                                    Supported formats: JPG, JPEG, PNG.
+                                    Maximum size: 5 MB.
+                                </div>
                             </div>
-                        }
 
-                        <div class="mb-3">
-                            <label asp-for="Image" class="form-label">Villa Image</label>
-                            <input asp-for="Image" class="form-control" accept="image/*" onchange="previewImage(this)"
-                                   placeholder="Describe the villa" />
-                            <span asp-validation-for="Image" class="text-danger small"></span>
-                            <small class="form-text text-muted">Supported formats: JPG, JPEG, PNG (Max 5MB)</small>
-                        </div>
+                            <div id="imagePreview"
+                                 class="image-preview mt-3 text-center"
+                                 style="display:none">
 
-                        <div id="imagePreview" class="mt-3 text-center" style="display:none">
-                            <img id="preview" class="img-thumbnail" style="max-width:300px;max-height:300px;" />
-                        </div>
+                                <p class="fw-semibold mb-3">
+                                    New image preview
+                                </p>
 
-                        <!-- Action Buttons -->
-                        <div class="d-flex gap-2 justify-content-end">
-                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-warning">
-                                <i class="bi bi-check me-2"></i>Update Villa
-                            </button>
-                        </div>
-                    </form>
+                                <img id="preview"
+                                     alt="Selected image preview"
+                                     class="img-fluid rounded"
+                                     style="max-height:300px; object-fit:cover;" />
+                            </div>
+
+                            <hr class="edit-divider" />
+
+                            <div class="d-flex flex-column flex-sm-row
+                                justify-content-end gap-3">
+
+                                <a asp-action="Index"
+                                   class="btn btn-cancel-villa">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Cancel
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-save-villa">
+                                    <i class="bi bi-check2-circle me-2"></i>
+                                    Save Changes
+                                </button>
+
+                            </div>
+
+                        </form>
+                    </div>
                 </div>
+
+                <p class="text-center edit-help mt-3">
+                    Review your changes before saving the property.
+                </p>
+
             </div>
         </div>
     </div>
@@ -92,23 +410,26 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
-        function previewImage(input){
-            const previewContainer = document.getElementById('imagePreview');
+        function previewImage(input) {
+            const previewContainer =
+                document.getElementById('imagePreview');
+
             const preview = document.getElementById('preview');
 
-            if(input.files && input.files[0]){
+            if (input.files && input.files[0]) {
                 const reader = new FileReader();
 
-                reader.onload = function (e){
-                    preview.src=e.target.result;
-                    previewContainer.style.display='block';
-                }
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                };
 
                 reader.readAsDataURL(input.files[0]);
-            }
-            else{
-                previewContainer.style.display='none';
+            } else {
+                preview.src = '';
+                previewContainer.style.display = 'none';
             }
         }
     </script>

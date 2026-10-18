@@ -1,28 +1,278 @@
 ﻿
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow mt-5 mb-5">
-                <div class="card-body p-5 text-center">
-                    <!-- Header -->
-                    <div class="mb-4">
-                        <i class="bi bi-shield-exclamation text-warning display-1"></i>
-                    </div>
+@{
+    ViewData["Title"] = "Access Denied | RoyalVilla";
+}
 
-                    <h3 class="fw-bold text-danger mb-3">Access Denied</h3>
-                    <p class="text-muted mb-4">
-                        Sorry, you don't have permission to access this resource.
-                        Please contact your administrator if you believe this is an error.
-                    </p>
+<style>
+    .rv-access-page {
+        min-height: calc(100vh - 70px);
+        background: #f8f6ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 45px 18px;
+        color: #29392e;
+    }
 
-                    <!-- Action Buttons -->
-                    <div class="d-grid gap-2">
-                        <a asp-action="Index" asp-controller="Home" class="btn btn-primary">
-                            <i class="bi bi-house me-2"></i>Go to Home
-                        </a>
-                    </div>
-                </div>
+    .rv-access-card {
+        width: 100%;
+        max-width: 600px;
+        background: #fff;
+        border: 1px solid #e5eae1;
+        border-radius: 22px;
+        overflow: hidden;
+        text-align: center;
+        box-shadow: 0 22px 65px rgba(29, 49, 35, .09);
+    }
+
+    .rv-access-top {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(140deg, #294b37, #142e21);
+        padding: 42px 25px 38px;
+        color: #fff;
+    }
+
+    .rv-access-top::after {
+        content: "";
+        position: absolute;
+        width: 200px;
+        height: 200px;
+        border: 1px solid rgba(215, 190, 129, .23);
+        border-radius: 50%;
+        right: -65px;
+        top: -100px;
+        box-shadow:
+            0 0 0 25px rgba(215, 190, 129, .035),
+            0 0 0 55px rgba(215, 190, 129, .025);
+        pointer-events: none;
+    }
+
+    .rv-access-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: rgba(255,255,255,.9);
+        font-size: .8rem;
+        font-weight: 750;
+        letter-spacing: 2.2px;
+    }
+
+    .rv-access-brand i {
+        color: #c7a96b;
+        font-size: 1.25rem;
+    }
+
+    .rv-access-icon {
+        width: 92px;
+        height: 92px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 32px auto 0;
+        border: 1px solid rgba(215, 190, 129, .6);
+        border-radius: 50%;
+        background: rgba(255,255,255,.055);
+        color: #d7c18e;
+        font-size: 2.65rem;
+    }
+
+    .rv-access-body {
+        padding: 38px clamp(24px, 6vw, 52px) 42px;
+    }
+
+    .rv-access-eyebrow {
+        color: #8b9888;
+        font-size: .69rem;
+        font-weight: 750;
+        letter-spacing: 2.4px;
+        text-transform: uppercase;
+        margin-bottom: 13px;
+    }
+
+    .rv-access-title {
+        font-family: Georgia, "Times New Roman", serif;
+        color: #193b2b;
+        font-size: clamp(2rem, 5vw, 2.7rem);
+        font-weight: 400;
+        letter-spacing: -.7px;
+        margin-bottom: 16px;
+    }
+
+    .rv-access-description {
+        color: #7b877c;
+        font-size: .93rem;
+        line-height: 1.85;
+        max-width: 410px;
+        margin: 0 auto 25px;
+    }
+
+    .rv-access-notice {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        text-align: left;
+        background: #f6f7f2;
+        border: 1px solid #e9ede5;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 26px;
+    }
+
+    .rv-access-notice-icon {
+        color: #7b8c70;
+        font-size: 1.15rem;
+        margin-top: 2px;
+    }
+
+    .rv-access-notice strong {
+        display: block;
+        color: #344a38;
+        font-size: .84rem;
+        margin-bottom: 4px;
+    }
+
+    .rv-access-notice p {
+        color: #849084;
+        font-size: .8rem;
+        line-height: 1.65;
+        margin: 0;
+    }
+
+    .rv-access-home {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        min-height: 51px;
+        background: #294b37;
+        color: #fff;
+        border: 1px solid #294b37;
+        border-radius: 10px;
+        font-size: .9rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+    .rv-access-home:hover {
+        background: #193627;
+        border-color: #193627;
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .rv-access-back {
+        display: inline-block;
+        margin-top: 19px;
+        color: #527057;
+        font-size: .84rem;
+        font-weight: 650;
+        text-decoration: none;
+    }
+
+    .rv-access-back:hover {
+        color: #193b2b;
+        text-decoration: underline;
+    }
+
+    .rv-access-footer {
+        color: #a0a89e;
+        font-size: .72rem;
+        margin-top: 28px;
+    }
+
+    @@media (max-width: 575.98px) {
+        .rv-access-page {
+            padding: 25px 12px;
+        }
+
+        .rv-access-top {
+            padding: 30px 20px;
+        }
+
+        .rv-access-icon {
+            width: 78px;
+            height: 78px;
+            font-size: 2.2rem;
+            margin-top: 25px;
+        }
+
+        .rv-access-body {
+            padding: 30px 22px;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .rv-access-home {
+            transition: none;
+        }
+    }
+</style>
+
+<div class="rv-access-page">
+    <section class="rv-access-card">
+
+        <div class="rv-access-top">
+            <div class="rv-access-brand">
+                <i class="bi bi-house-heart"></i>
+                ROYALVILLA
+            </div>
+
+            <div class="rv-access-icon">
+                <i class="bi bi-shield-lock"></i>
             </div>
         </div>
-    </div>
+
+        <div class="rv-access-body">
+
+            <div class="rv-access-eyebrow">
+                Restricted Area
+            </div>
+
+            <h1 class="rv-access-title">
+                Access Denied
+            </h1>
+
+            <p class="rv-access-description">
+                This part of RoyalVilla is reserved for authorised users.
+                Your current account does not have permission to access
+                this resource.
+            </p>
+
+            <div class="rv-access-notice">
+                <i class="bi bi-info-circle rv-access-notice-icon"></i>
+
+                <div>
+                    <strong>Need access to this page?</strong>
+                    <p>
+                        If you believe this is a mistake, contact your
+                        administrator to review your account permissions.
+                    </p>
+                </div>
+            </div>
+
+            <a asp-action="Index"
+               asp-controller="Home"
+               class="rv-access-home">
+                <i class="bi bi-house-door"></i>
+                Return to RoyalVilla Home
+                <i class="bi bi-arrow-right"></i>
+            </a>
+
+            <a asp-action="Login"
+               asp-controller="Auth"
+               class="rv-access-back">
+                <i class="bi bi-box-arrow-in-right me-1"></i>
+                Sign in with another account
+            </a>
+
+            <div class="rv-access-footer">
+                <i class="bi bi-shield-check me-1"></i>
+                RoyalVilla · Secure access
+            </div>
+
+        </div>
+    </section>
 </div>
