@@ -1,100 +1,624 @@
-﻿@model RoyalVilla.DTO.RegisterationRequestDTO
-<div class="container">
-	<div class="row justify-content-center">
-		<div class="col-md-6 col-lg-5">
-			<!-- TempData Messages -->
-			@if (TempData["success"] != null)
-			{
-				<div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-					<i class="bi bi-check-circle-fill me-2"></i> @TempData["success"]
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			}
-			@if (TempData["error"] != null)
-			{
-				<div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
-					<i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["error"]
-					<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-				</div>
-			}
-			<div class="card shadow mt-5 mb-5">
-				<div class="card-body p-5">
-					<!-- Header -->
-					<div class="text-center mb-4">
-						<div class="mb-3">
-							<i class="bi bi-person-plus-fill text-success display-1"></i>
-						</div>
-						<h3 class="fw-bold text-primary mb-2">Create Account</h3>
-						<p class="text-muted">Join our exclusive villa community</p>
-					</div>
+﻿
+@model RoyalVilla.DTO.RegisterationRequestDTO
 
-					<!-- Register Form -->
-					<form asp-action="Register" method="post">
-						<div asp-validation-summary="All" class="text-danger mb-3"></div>
+@{
+    ViewData["Title"] = "Create Account | RoyalVilla";
+    Layout = "_Layout";
+}
 
-						<!-- Name Field -->
-						<div class="form-floating mb-3">
-							<input asp-for="Name" class="form-control" placeholder="Full Name" />
-							<label asp-for="Name" class="form-label">
-								<i class="bi bi-person me-2"></i>Full Name
-							</label>
-							<span asp-validation-for="Name" class="text-danger"></span>
-						</div>
+<style>
+    .rv-register-page {
+        --rv-green: #193b2b;
+        --rv-dark: #102b20;
+        --rv-gold: #c7a96b;
+        --rv-ivory: #f8f6ef;
+        --rv-muted: #899489;
 
-						<!-- Email Field -->
-						<div class="form-floating mb-3">
-							<input asp-for="Email" class="form-control" placeholder="name@example.com" />
-							<label asp-for="Email" class="form-label">
-								<i class="bi bi-envelope me-2"></i>Email Address
-							</label>
-							<span asp-validation-for="Email" class="text-danger"></span>
-						</div>
+        min-height: calc(100vh - 70px);
+        background: var(--rv-ivory);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 45px 20px;
+        color: #29392e;
+    }
 
-						<!-- Password Field -->
-						<div class="form-floating mb-3">
-							<input asp-for="Password" class="form-control" placeholder="Password" type="password" />
-							<label asp-for="Password" class="form-label">
-								<i class="bi bi-lock me-2"></i>Password
-							</label>
-							<span asp-validation-for="Password" class="text-danger"></span>
-						</div>
+    .rv-register-shell {
+        width: 100%;
+        max-width: 1050px;
+        min-height: 650px;
+        display: grid;
+        grid-template-columns: .92fr 1.08fr;
+        background: #fff;
+        border: 1px solid #e5eae1;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 25px 75px rgba(29, 49, 35, .11);
+    }
 
-						<!-- Role Field -->
-						<div class="form-floating mb-4">
-							<select asp-for="Role" class="form-select">
-								<option value="Customer" selected>Customer</option>
-								<option value="Admin">Admin</option>
-							</select>
-							<label asp-for="Role" class="form-label">
-								<i class="bi bi-shield-check me-2"></i>Account Type
-							</label>
-							<span asp-validation-for="Role" class="text-danger"></span>
-						</div>
+    /* Branding panel */
+    .rv-register-showcase {
+        position: relative;
+        isolation: isolate;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 42px;
+        overflow: hidden;
+        color: white;
+        background: var(--rv-green);
+    }
 
-						<!-- Submit Button -->
-						<div class="d-grid mb-3">
-							<button type="submit" class="btn btn-success btn-lg">
-								<i class="bi bi-check-circle me-2"></i>Create Account
-							</button>
-						</div>
+    .rv-register-showcase::before,
+    .rv-register-showcase::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        pointer-events: none;
+    }
 
-						<!-- Divider -->
-						<hr class="my-4">
-						<div class="text-center">
-							<small class="text-muted">OR</small>
-						</div>
-						<hr class="my-4">
+    .rv-register-showcase::before {
+        inset: 0;
+        background:
+            radial-gradient(ellipse at 15% 15%,
+                rgba(202, 180, 122, .2), transparent 42%),
+            linear-gradient(145deg, #294c36, #193b2b 55%, #10291e);
+    }
 
-						<!-- Login Link -->
-						<div class="text-center">
-							<p class="mb-3 text-muted">Already have an account?</p>
-							<a asp-action="Login" class="btn btn-outline-primary">
-								<i class="bi bi-box-arrow-in-right me-2"></i>Sign In Instead
-							</a>
-						</div>
-					</form>
-				</div>
-			</div>
-		</div>
-	</div>
+    .rv-register-showcase::after {
+        width: 330px;
+        height: 330px;
+        border: 1px solid rgba(218, 196, 143, .24);
+        border-radius: 50%;
+        right: -120px;
+        bottom: -100px;
+        box-shadow:
+            0 0 0 30px rgba(218, 196, 143, .045),
+            0 0 0 65px rgba(218, 196, 143, .035),
+            0 0 0 100px rgba(218, 196, 143, .025);
+    }
+
+    .rv-register-brand {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
+
+    .rv-brand-symbol {
+        width: 46px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(215, 190, 129, .65);
+        border-radius: 13px;
+        color: var(--rv-gold);
+        font-size: 1.4rem;
+    }
+
+    .rv-brand-name {
+        font-size: 1.12rem;
+        font-weight: 750;
+        letter-spacing: 2.5px;
+    }
+
+    .rv-brand-caption {
+        color: rgba(255, 255, 255, .58);
+        font-size: .65rem;
+        letter-spacing: 2.1px;
+        margin-top: 3px;
+    }
+
+    .rv-register-showcase-content {
+        padding: 35px 0;
+    }
+
+    .rv-register-eyebrow {
+        color: var(--rv-gold);
+        font-size: .68rem;
+        font-weight: 750;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+    }
+
+    .rv-register-showcase h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2.3rem, 4vw, 3.35rem);
+        line-height: 1.13;
+        font-weight: 400;
+        letter-spacing: -.8px;
+        margin: 23px 0;
+    }
+
+    .rv-register-showcase h1 em {
+        color: #d9c89e;
+        font-weight: 400;
+    }
+
+    .rv-register-description {
+        color: rgba(255, 255, 255, .72);
+        font-size: .92rem;
+        line-height: 1.9;
+    }
+
+    .rv-register-benefit {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 22px;
+        color: rgba(255,255,255,.86);
+        font-size: .85rem;
+    }
+
+    .rv-register-benefit i {
+        color: var(--rv-gold);
+        font-size: 1.05rem;
+    }
+
+    .rv-register-footer {
+        color: rgba(255,255,255,.55);
+        font-size: .74rem;
+    }
+
+    /* Form panel */
+    .rv-register-form-panel {
+        padding: 42px clamp(27px, 5vw, 58px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .rv-form-eyebrow {
+        color: #82917e;
+        font-size: .68rem;
+        font-weight: 750;
+        letter-spacing: 2.4px;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    .rv-register-heading {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 2.4rem;
+        font-weight: 400;
+        letter-spacing: -.7px;
+        color: #1b3827;
+        margin-bottom: 10px;
+    }
+
+    .rv-register-subtitle {
+        color: var(--rv-muted);
+        font-size: .88rem;
+        line-height: 1.7;
+        margin-bottom: 28px;
+    }
+
+    .rv-register-page .form-label {
+        color: #34483a;
+        font-size: .81rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .rv-register-input-wrap {
+        position: relative;
+    }
+
+    .rv-register-input-icon {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        color: #879586;
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .rv-register-page .rv-register-input,
+    .rv-register-page .rv-register-select {
+        width: 100%;
+        min-height: 48px;
+        padding: 12px 43px;
+        border: 1px solid #e1e7de;
+        border-radius: 9px;
+        background-color: #fbfcf9;
+        color: #25392a;
+        font-size: .87rem;
+        transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .rv-register-page .rv-register-select {
+        padding-right: 35px;
+    }
+
+    .rv-register-page .rv-register-input:focus,
+    .rv-register-page .rv-register-select:focus {
+        outline: none;
+        border-color: #67876a;
+        background-color: #fff;
+        box-shadow: 0 0 0 4px rgba(73, 113, 77, .09);
+    }
+
+    .rv-register-page .rv-register-input::placeholder {
+        color: #a2aba1;
+    }
+
+    .rv-register-password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 30px;
+        border: 0;
+        background: transparent;
+        color: #829083;
+        cursor: pointer;
+    }
+
+    .rv-register-password-toggle:hover {
+        color: var(--rv-green);
+    }
+
+    .rv-register-btn {
+        width: 100%;
+        min-height: 51px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        border: 1px solid var(--rv-green);
+        border-radius: 9px;
+        background: var(--rv-green);
+        color: #fff;
+        font-size: .9rem;
+        font-weight: 700;
+        transition: .2s ease;
+    }
+
+    .rv-register-btn:hover {
+        background: var(--rv-dark);
+        border-color: var(--rv-dark);
+        color: #fff;
+        transform: translateY(-1px);
+    }
+
+    .rv-register-btn i {
+        color: #d8c18b;
+    }
+
+    .rv-register-page .alert {
+        border: 0;
+        border-radius: 9px;
+        font-size: .83rem;
+    }
+
+    .rv-register-page .validation-summary-errors {
+        color: #b42318;
+        font-size: .82rem;
+    }
+
+    .rv-register-page .validation-summary-errors ul {
+        padding-left: 19px;
+        margin-bottom: 0;
+    }
+
+    .rv-register-page .field-validation-error {
+        display: block;
+        font-size: .78rem;
+        margin-top: 5px;
+    }
+
+    .rv-register-login {
+        margin-top: 23px;
+        padding-top: 20px;
+        border-top: 1px solid #edf0e9;
+        text-align: center;
+        color: #899389;
+        font-size: .84rem;
+    }
+
+    .rv-register-login a {
+        color: #315c3c;
+        font-weight: 750;
+        text-decoration: none;
+    }
+
+    .rv-register-login a:hover {
+        color: #173d26;
+        text-decoration: underline;
+    }
+
+    .rv-register-security {
+        margin-top: 20px;
+        text-align: center;
+        color: #9ba49a;
+        font-size: .72rem;
+    }
+
+    .rv-register-security i {
+        color: #648168;
+        margin-right: 5px;
+    }
+
+    @@media (max-width: 767.98px) {
+        .rv-register-page {
+            min-height: auto;
+            padding: 25px 14px;
+        }
+
+        .rv-register-shell {
+            max-width: 490px;
+            grid-template-columns: 1fr;
+            border-radius: 17px;
+        }
+
+        .rv-register-showcase {
+            min-height: 265px;
+            padding: 26px;
+        }
+
+        .rv-register-showcase-content {
+            padding: 30px 0 20px;
+        }
+
+        .rv-register-showcase h1 {
+            font-size: 2.3rem;
+            margin: 15px 0;
+        }
+
+        .rv-register-benefit,
+        .rv-register-footer {
+            display: none;
+        }
+
+        .rv-register-form-panel {
+            padding: 32px 25px;
+        }
+
+        .rv-register-heading {
+            font-size: 2.15rem;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .rv-register-btn,
+        .rv-register-page .rv-register-input,
+        .rv-register-page .rv-register-select {
+            transition: none;
+        }
+    }
+</style>
+
+<div class="rv-register-page">
+    <div class="rv-register-shell">
+
+        <!-- Brand and welcome panel -->
+        <section class="rv-register-showcase">
+
+            <div class="rv-register-brand">
+                <div class="rv-brand-symbol">
+                    <i class="bi bi-house-heart"></i>
+                </div>
+
+                <div>
+                    <div class="rv-brand-name">ROYALVILLA</div>
+                    <div class="rv-brand-caption">STAYS WITH DISTINCTION</div>
+                </div>
+            </div>
+
+            <div class="rv-register-showcase-content">
+                <div class="rv-register-eyebrow">
+                    YOUR JOURNEY BEGINS HERE
+                </div>
+
+                <h1>
+                    A better stay<br />
+                    starts with <em>you.</em>
+                </h1>
+
+                <p class="rv-register-description">
+                    Create your account and discover a more personal
+                    way to explore villas, plan getaways and make
+                    unforgettable memories.
+                </p>
+
+                <div class="rv-register-benefit">
+                    <i class="bi bi-check-circle"></i>
+                    Discover properties and their amenities
+                </div>
+
+                <div class="rv-register-benefit">
+                    <i class="bi bi-check-circle"></i>
+                    Plan your next villa stay
+                </div>
+            </div>
+
+            <div class="rv-register-footer">
+                <i class="bi bi-stars me-2"></i>
+                Your comfort. Your space. Your experience.
+            </div>
+
+        </section>
+
+        <!-- Registration form -->
+        <section class="rv-register-form-panel">
+
+            @if (TempData["success"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show mb-3"
+                     role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    @TempData["success"]
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show mb-3"
+                     role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    @TempData["error"]
+                    <button type="button" class="btn-close"
+                            data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <div class="rv-form-eyebrow">BECOME A MEMBER</div>
+
+            <h2 class="rv-register-heading">Create account.</h2>
+
+            <p class="rv-register-subtitle">
+                Join RoyalVilla and start planning your next escape.
+            </p>
+
+            <form asp-action="Register" method="post">
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">
+                        Full name
+                    </label>
+
+                    <div class="rv-register-input-wrap">
+                        <i class="bi bi-person rv-register-input-icon"></i>
+
+                        <input asp-for="Name"
+                               class="rv-register-input"
+                               placeholder="Enter your full name"
+                               autocomplete="name" />
+                    </div>
+
+                    <span asp-validation-for="Name"
+                          class="text-danger field-validation-error"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label">
+                        Email address
+                    </label>
+
+                    <div class="rv-register-input-wrap">
+                        <i class="bi bi-envelope rv-register-input-icon"></i>
+
+                        <input asp-for="Email"
+                               type="email"
+                               class="rv-register-input"
+                               placeholder="you@example.com"
+                               autocomplete="email" />
+                    </div>
+
+                    <span asp-validation-for="Email"
+                          class="text-danger field-validation-error"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">
+                        Password
+                    </label>
+
+                    <div class="rv-register-input-wrap">
+                        <i class="bi bi-lock rv-register-input-icon"></i>
+
+                        <input asp-for="Password"
+                               id="registerPassword"
+                               type="password"
+                               class="rv-register-input"
+                               placeholder="Create a password"
+                               autocomplete="new-password" />
+
+                        <button type="button"
+                                id="toggleRegisterPassword"
+                                class="rv-register-password-toggle"
+                                aria-label="Show password"
+                                aria-pressed="false">
+                            <i class="bi bi-eye" id="registerPasswordEye"></i>
+                        </button>
+                    </div>
+
+                    <span asp-validation-for="Password"
+                          class="text-danger field-validation-error"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Role" class="form-label">
+                        Account type
+                    </label>
+
+                    <div class="rv-register-input-wrap">
+                        <i class="bi bi-shield-check rv-register-input-icon"></i>
+
+                        <select asp-for="Role" class="rv-register-select">
+                            <option value="Customer">Customer</option>
+                        </select>
+                    </div>
+
+                    <span asp-validation-for="Role"
+                          class="text-danger field-validation-error"></span>
+
+                    <small class="text-muted d-block mt-2"
+                           style="font-size:.75rem;">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Admin access must be assigned securely by an administrator.
+                    </small>
+                </div>
+
+                <button type="submit" class="btn rv-register-btn">
+                    Create My Account
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+                <div class="rv-register-login">
+                    Already have an account?
+
+                    <div class="mt-2">
+                        <a asp-action="Login">
+                            Sign in instead
+                            <i class="bi bi-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="rv-register-security">
+                    <i class="bi bi-shield-lock"></i>
+                    Your account information is protected.
+                </div>
+            </form>
+
+        </section>
+    </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const passwordInput = document.getElementById('registerPassword');
+            const toggleButton = document.getElementById('toggleRegisterPassword');
+            const eyeIcon = document.getElementById('registerPasswordEye');
+
+            if (!passwordInput || !toggleButton || !eyeIcon) {
+                return;
+            }
+
+            toggleButton.addEventListener('click', function () {
+                const isPassword = passwordInput.type === 'password';
+
+                passwordInput.type = isPassword ? 'text' : 'password';
+                eyeIcon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+
+                toggleButton.setAttribute('aria-pressed', String(isPassword));
+                toggleButton.setAttribute(
+                    'aria-label',
+                    isPassword ? 'Hide password' : 'Show password'
+                );
+            });
+        });
+    </script>
+}
