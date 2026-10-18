@@ -326,9 +326,9 @@
                             Tell us when you're visiting and who's coming.
                         </p>
 
-                        <form asp-controller="Book"
+                        <form asp-controller="BookVilla"
                               asp-action="SubmitBooking"
-                              asp-route-id="@Model.villaId"
+                              asp-route-id="@Model.Villa.Id"
                               method="post">
 
                             @Html.AntiForgeryToken()
