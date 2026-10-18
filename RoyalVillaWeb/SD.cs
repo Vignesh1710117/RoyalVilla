@@ -14,6 +14,8 @@
         public const string SessionAccessToken = "JwtToken";
         public const string SessionRefreshToken = "RefreshToken";
         public const string CurrentApiVersion = "v2";
+
+        public const string NotFoundpage = "~/Views/Shared/NotFound.cshtml";
         public static string ApiBaseURL { get; set; }
 
         public static string getImageURL(string? Imageurl)

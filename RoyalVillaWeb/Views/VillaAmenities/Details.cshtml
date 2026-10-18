@@ -57,4 +57,11 @@
     <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-3">
         Back to Villas
     </a>
+
+    <a asp-controller="BookVilla"
+       asp-action="BookingPage"
+       asp-route-id="@Model.Villa.Id"
+       class="btn btn-primary mt-3">
+        Book Now
+    </a>
 </div>

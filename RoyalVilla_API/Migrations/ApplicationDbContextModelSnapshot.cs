@@ -229,6 +229,43 @@ namespace RoyalVilla_API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RoyalVilla_API.Models.BookVilla", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BookVillaId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfNights")
+                        .HasColumnType("int");
+
+                    b.Property<int>("adult")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("checkIn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("checkOut")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("children")
+                        .HasColumnType("int");
+
+                    b.Property<int>("villaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("villaId");
+
+                    b.ToTable("BookVillas");
+                });
+
             modelBuilder.Entity("RoyalVilla_API.Models.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -486,6 +523,17 @@ namespace RoyalVilla_API.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("RoyalVilla_API.Models.BookVilla", b =>
+                {
+                    b.HasOne("RoyalVilla_API.Models.Villa", "villa")
+                        .WithMany()
+                        .HasForeignKey("villaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("villa");
                 });
 
             modelBuilder.Entity("RoyalVilla_API.Models.VillaAmenities", b =>

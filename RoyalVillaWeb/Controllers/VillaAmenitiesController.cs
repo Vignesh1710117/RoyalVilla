@@ -30,7 +30,7 @@ namespace RoyalVillaWeb.Controllers
 
                 if (villaResponse?.Data == null)
                 {
-                    return View("~/Views/Shared/NotFound.cshtml");
+                    return View(SD.NotFoundpage);
                 }
 
                 var amenitiesResponse = await _VillaAmenitiesService.GetAmenityAsync<ApiResponse<List<VillaAmentiesDTO>>>(id);
