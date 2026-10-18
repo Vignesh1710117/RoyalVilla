@@ -1,0 +1,457 @@
+﻿@model RoyalVilla_API.Models.BookVillaDTO
+@using RoyalVillaWeb
+
+@{
+    ViewData["Title"] = "Reserve Your Stay";
+}
+
+<style>
+    .booking-page {
+        background: #f5f6f2;
+        min-height: 100vh;
+        padding: 48px 0 64px;
+        color: #24352c;
+    }
+
+    .booking-heading {
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 700;
+        letter-spacing: -1.3px;
+        color: #20392d;
+    }
+    .booking-subtitle {
+        color: #758078;
+        font-size: 1rem;
+    }
+
+    .villa-panel,
+    .form-panel {
+        background: #fff;
+        border: 1px solid #e8ebe5;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 12px 35px rgba(33, 54, 42, .055);
+    }
+
+    .villa-image-wrap {
+        position: relative;
+        background: #e7ebe4;
+    }
+
+    .villa-image {
+        width: 100%;
+        height: 285px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .villa-label {
+        position: absolute;
+        top: 18px;
+        left: 18px;
+        background: rgba(255,255,255,.94);
+        color: #294b39;
+        padding: 8px 13px;
+        border-radius: 30px;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    .villa-content {
+        padding: 25px;
+    }
+
+    .eyebrow {
+        color: #819083;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .villa-name {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #233d30;
+        margin: 7px 0 12px;
+    }
+
+    .villa-description {
+        color: #788078;
+        font-size: .94rem;
+        line-height: 1.75;
+    }
+
+    .villa-facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 22px 0;
+    }
+
+    .villa-fact {
+        flex: 1 1 100px;
+        padding: 13px;
+        border-radius: 12px;
+        background: #f5f7f3;
+    }
+
+        .villa-fact small {
+            display: block;
+            color: #7d877e;
+            margin-bottom: 5px;
+        }
+
+        .villa-fact strong {
+            color: #2d4938;
+            font-size: .95rem;
+        }
+
+    .price-box {
+        padding-top: 20px;
+        border-top: 1px solid #edf0eb;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .price-value {
+        color: #244632;
+        font-size: 1.65rem;
+        font-weight: 750;
+    }
+
+    .price-caption {
+        color: #8a928b;
+        font-size: .82rem;
+    }
+
+    .form-panel {
+        padding: clamp(22px, 4vw, 38px);
+    }
+
+    .form-title {
+        font-size: 1.55rem;
+        font-weight: 700;
+        color: #253b2e;
+    }
+
+    .form-intro {
+        color: #818981;
+        font-size: .92rem;
+    }
+
+    .section-label {
+        font-size: .76rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        font-weight: 700;
+        color: #6e806f;
+        margin-bottom: 17px;
+    }
+
+    .booking-page .form-label {
+        color: #394a3e;
+        font-size: .88rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .booking-page .form-control {
+        border: 1px solid #dfe5dc;
+        background: #fbfcfa;
+        border-radius: 11px;
+        min-height: 49px;
+        padding: 12px 14px;
+        color: #263b2e;
+    }
+
+        .booking-page .form-control:focus {
+            border-color: #557c61;
+            box-shadow: 0 0 0 .2rem rgba(64, 111, 78, .12);
+            background: #fff;
+        }
+
+    .booking-divider {
+        border: 0;
+        border-top: 1px solid #edf0eb;
+        margin: 26px 0;
+    }
+
+    .booking-note {
+        background: #f3f7f1;
+        color: #5c705f;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: .86rem;
+        line-height: 1.6;
+    }
+
+    .btn-booking {
+        background: #284b36;
+        color: #fff;
+        border: 1px solid #284b36;
+        border-radius: 11px;
+        padding: 13px 22px;
+        font-weight: 650;
+        transition: background .2s, transform .2s;
+    }
+
+        .btn-booking:hover {
+            background: #1c3828;
+            border-color: #1c3828;
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .btn-back {
+        color: #42594a;
+        border: 1px solid #dce3da;
+        border-radius: 11px;
+        padding: 13px 18px;
+        font-weight: 600;
+    }
+
+        .btn-back:hover {
+            background: #f3f6f1;
+            color: #263d2e;
+        }
+
+    @@media (max-width: 767px) {
+        .booking-page {
+            padding-top: 28px;
+        }
+
+        .villa-image {
+            height: 230px;
+        }
+    }
+</style>
+
+<div class="booking-page">
+    <div class="container">
+
+        <!-- Page heading -->
+        <div class="mb-4 mb-md-5">
+            <div class="eyebrow mb-2">ROYALVILLA · YOUR NEXT GETAWAY</div>
+            <h1 class="booking-heading">Reserve your stay.</h1>
+            <p class="booking-subtitle mb-0">
+                A few details, and your getaway is one step closer.
+            </p>
+        </div>
+
+        @if (Model.Villa == null)
+        {
+            <div class="alert alert-warning">
+                Villa details could not be loaded. Please go back and
+                select a villa again.
+            </div>
+        }
+        else
+        {
+            <div class="row g-4 align-items-start">
+
+                <!-- LEFT: Villa summary -->
+                <div class="col-lg-5">
+                    <div class="villa-panel">
+
+                        <div class="villa-image-wrap">
+                            <img src="@SD.getImageURL(Model.Villa.ImageUrl)"
+                                 alt="@Model.Villa.Name"
+                                 class="villa-image" />
+
+                            <span class="villa-label">
+                                Your selected villa
+                            </span>
+                        </div>
+
+                        <div class="villa-content">
+                            <div class="eyebrow">YOUR DESTINATION</div>
+
+                            <h2 class="villa-name">
+                                @Model.Villa.Name
+                            </h2>
+
+                            <p class="villa-description mb-0">
+                                @Model.Villa.Details
+                            </p>
+
+                            <div class="villa-facts">
+                                <div class="villa-fact">
+                                    <small>Villa area</small>
+                                    <strong>@Model.Villa.Sqft sq.ft.</strong>
+                                </div>
+
+                                <div class="villa-fact">
+                                    <small>Occupancy</small>
+                                    <strong>@Model.Villa.Occupancy guests</strong>
+                                </div>
+                            </div>
+
+                            <div class="price-box">
+                                <div>
+                                    <div class="price-caption">
+                                        Price per night
+                                    </div>
+                                    <div class="price-value">
+                                        ₹@Model.Villa.Rate.ToString("N0")
+                                    </div>
+                                </div>
+
+                                <span class="price-caption">
+                                    Excluding any additional charges
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="booking-note mt-3">
+                        <strong>Good to know</strong><br />
+                        Your dates will be checked for availability before
+                        the booking is saved.
+                    </div>
+                </div>
+
+                <!-- RIGHT: Booking form -->
+                <div class="col-lg-7">
+                    <div class="form-panel">
+
+                        <h2 class="form-title mb-2">
+                            Your booking details
+                        </h2>
+
+                        <p class="form-intro mb-4">
+                            Tell us when you're visiting and who's coming.
+                        </p>
+
+                        <form asp-controller="Book"
+                              asp-action="SubmitBooking"
+                              asp-route-id="@Model.villaId"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" asp-for="villaId" />
+
+                            <div asp-validation-summary="ModelOnly"
+                                 class="text-danger mb-3"></div>
+
+                            <div class="section-label">
+                                <span>01</span> &nbsp; Your stay
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="checkIn"
+                                           class="form-label">
+                                        Check-in
+                                    </label>
+
+                                    <input asp-for="checkIn"
+                                           type="date"
+                                           class="form-control"
+                                           required
+                                           min="@DateTime.Today.ToString("yyyy-MM-dd")" />
+
+                                    <span asp-validation-for="checkIn"
+                                          class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label asp-for="checkOut"
+                                           class="form-label">
+                                        Check-out
+                                    </label>
+
+                                    <input asp-for="checkOut"
+                                           type="date"
+                                           class="form-control"
+                                           required
+                                           min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" />
+
+                                    <span asp-validation-for="checkOut"
+                                          class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <hr class="booking-divider" />
+
+                            <div class="section-label">
+                                <span>02</span> &nbsp; Guests
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-sm-6">
+                                    <label asp-for="adult"
+                                           class="form-label">
+                                        Adults
+                                    </label>
+
+                                    <input asp-for="adult"
+                                           type="number"
+                                           class="form-control"
+                                           min="1"
+                                           max="@Model.Villa.Occupancy"
+                                           required />
+
+                                    <span asp-validation-for="adult"
+                                          class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-sm-6">
+                                    <label asp-for="children"
+                                           class="form-label">
+                                        Children
+                                    </label>
+
+                                    <input asp-for="children"
+                                           type="number"
+                                           class="form-control"
+                                           min="0"
+                                           max="@Model.Villa.Occupancy"
+                                           required />
+
+                                    <span asp-validation-for="children"
+                                          class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <hr class="booking-divider" />
+
+                            <div class="booking-note mb-4">
+                                <strong>Almost there!</strong><br />
+                                We'll check your selected dates against
+                                existing reservations before saving your
+                                booking.
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row
+                                justify-content-between gap-3">
+
+                                <a asp-controller="VillaAmenities"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.villaId"
+                                   class="btn btn-back">
+                                    ← Back to villa
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-booking">
+                                    Submit Booking &nbsp; →
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

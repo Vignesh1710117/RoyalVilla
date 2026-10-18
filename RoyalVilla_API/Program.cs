@@ -133,11 +133,14 @@ builder.Services.AddAutoMapper(o => {
     o.CreateMap<VillaAmenities, VillaAmentiesDTO>()
     .ForMember(dist=>dist.VillaName, opt=>opt.MapFrom(src => src.villa!=null? src.villa.Name : null));
     o.CreateMap<VillaAmentiesDTO, VillaAmenities>();
+    o.CreateMap<BookVilla, BookVillaDTO>().ReverseMap();
+    o.CreateMap<BookingVillaDTO, BookVillaDTO>().ReverseMap();
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IBookVillaService, BookVillaService>();
 
 
 var app = builder.Build();
