@@ -1,0 +1,470 @@
+﻿@model RoyalVilla_API.Models.AddBookingGuestsDTO
+
+@{
+    ViewData["Title"] = "Guest Details";
+}
+
+<style>
+    .guest-page {
+        background: #f7f8f4;
+        min-height: 85vh;
+        padding: 48px 0;
+    }
+
+    .guest-heading {
+        color: #263d2e;
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 750;
+        letter-spacing: -0.8px;
+    }
+
+    .guest-subtitle {
+        color: #778278;
+        max-width: 620px;
+    }
+
+    .guest-card {
+        background: #fff;
+        border: 1px solid #e8ece5;
+        border-radius: 18px;
+        box-shadow: 0 10px 35px rgba(38, 61, 46, 0.06);
+        overflow: hidden;
+    }
+
+    .guest-card-header {
+        background: #284b36;
+        color: #fff;
+        padding: 22px 26px;
+    }
+
+        .guest-card-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .guest-card-header p {
+            color: #dbe6dc;
+            font-size: .88rem;
+            margin-bottom: 0;
+        }
+
+    .guest-card-body {
+        padding: 26px;
+    }
+
+    .guest-section-label {
+        color: #738274;
+        font-size: .75rem;
+        font-weight: 750;
+        letter-spacing: 1.3px;
+        text-transform: uppercase;
+    }
+
+    .guest-entry {
+        border: 1px solid #e4e9e1;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 18px;
+        background: #fff;
+    }
+
+    .guest-number {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: #edf3eb;
+        color: #284b36;
+        font-weight: 750;
+        flex-shrink: 0;
+    }
+
+    .guest-page .form-label {
+        color: #394a3e;
+        font-size: .88rem;
+        font-weight: 650;
+        margin-bottom: 8px;
+    }
+
+    .guest-page .form-control {
+        border: 1px solid #dfe5dc;
+        background: #fbfcfa;
+        border-radius: 10px;
+        min-height: 47px;
+        padding: 11px 13px;
+    }
+
+        .guest-page .form-control:focus {
+            border-color: #557c61;
+            box-shadow: 0 0 0 .2rem rgba(64, 111, 78, .12);
+            background: #fff;
+        }
+
+    .btn-guest-primary {
+        background: #284b36;
+        color: #fff;
+        border: 1px solid #284b36;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 650;
+    }
+
+        .btn-guest-primary:hover {
+            background: #1c3828;
+            border-color: #1c3828;
+            color: #fff;
+        }
+
+    .btn-guest-secondary {
+        background: #fff;
+        color: #284b36;
+        border: 1px solid #dce5d9;
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-weight: 650;
+    }
+
+        .btn-guest-secondary:hover {
+            background: #f0f5ee;
+            color: #1c3828;
+        }
+
+    .btn-remove-guest {
+        border: 0;
+        background: transparent;
+        color: #a44c48;
+        font-size: .86rem;
+        font-weight: 650;
+    }
+
+    .guest-note {
+        background: #f0f5ee;
+        border-radius: 11px;
+        padding: 14px 16px;
+        color: #526957;
+        font-size: .88rem;
+        line-height: 1.6;
+    }
+
+    .booking-reference {
+        background: #f9f5e9;
+        border: 1px solid #eee4c9;
+        border-radius: 12px;
+        padding: 14px 16px;
+        overflow-wrap: anywhere;
+    }
+
+    @@media (max-width: 576px) {
+        .guest-page {
+            padding: 28px 0;
+        }
+
+        .guest-card-body {
+            padding: 18px;
+        }
+
+        .guest-entry {
+            padding: 16px;
+        }
+    }
+</style>
+
+<div class="guest-page">
+    <div class="container">
+
+        <div class="mb-4 mb-md-5">
+            <div class="guest-section-label mb-2">
+                ROYALVILLA · ALMOST THERE
+            </div>
+
+            <h1 class="guest-heading">Who's joining your stay?</h1>
+
+            <p class="guest-subtitle mb-0">
+                Enter the details of each guest staying at your selected villa.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+
+                <div class="guest-card">
+                    <div class="guest-card-header">
+                        <h2>
+                            <i class="bi bi-people me-2"></i>
+                            Guest information
+                        </h2>
+                        <p>Add the first name, last name and age of each guest.</p>
+                    </div>
+
+                    <div class="guest-card-body">
+
+                        <div class="booking-reference mb-4">
+                            <div class="small text-muted mb-1">
+                                Booking reference
+                            </div>
+
+                            <div class="fw-bold" style="color:#284b36;">
+                                @Model.BookVillaId
+                            </div>
+                        </div>
+
+                        <form asp-controller="Guest"
+                              asp-action="GuestSubmission"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   asp-for="BookVillaId" />
+
+                            <div asp-validation-summary="ModelOnly"
+                                 class="text-danger mb-3"></div>
+
+                            <div class="d-flex justify-content-between
+                                align-items-center mb-3">
+                                <div>
+                                    <div class="guest-section-label">
+                                        Guest details
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        Add all guests for this booking.
+                                    </div>
+                                </div>
+
+                                <span class="badge rounded-pill"
+                                      id="guestCount"
+                                      style="background:#edf3eb;color:#284b36;">
+                                    @Model.Guests.Count guest(s)
+                                </span>
+                            </div>
+
+                            <div id="guestContainer">
+                                @for (int i = 0; i < Model.Guests.Count; i++)
+                                {
+                                    <div class="guest-entry">
+                                        <div class="d-flex align-items-center
+                                            justify-content-between mb-4">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <span class="guest-number">
+                                                    @(i + 1)
+                                                </span>
+
+                                                <div>
+                                                    <div class="fw-bold guest-title"
+                                                         style="color:#263d2e;">
+                                                        Guest @(i + 1)
+                                                    </div>
+                                                    <div class="text-muted small">
+                                                        Personal details
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            @if (i > 0)
+                                            {
+                                                <button type="button"
+                                                        class="btn-remove-guest"
+                                                        onclick="removeGuest(this)">
+                                                    <i class="bi bi-trash3 me-1"></i>
+                                                    Remove
+                                                </button>
+                                            }
+                                        </div>
+
+                                        <div class="row g-3">
+                                            <div class="col-md-5">
+                                                <label asp-for="Guests[i].firstName"
+                                                       class="form-label">
+                                                    First name
+                                                </label>
+
+                                                <input asp-for="Guests[i].firstName"
+                                                       class="form-control"
+                                                       placeholder="Enter first name"
+                                                       required />
+
+                                                <span asp-validation-for="Guests[i].firstName"
+                                                      class="text-danger small"></span>
+                                            </div>
+
+                                            <div class="col-md-5">
+                                                <label asp-for="Guests[i].lastName"
+                                                       class="form-label">
+                                                    Last name
+                                                </label>
+
+                                                <input asp-for="Guests[i].lastName"
+                                                       class="form-control"
+                                                       placeholder="Enter last name"
+                                                       required />
+
+                                                <span asp-validation-for="Guests[i].lastName"
+                                                      class="text-danger small"></span>
+                                            </div>
+
+                                            <div class="col-md-2">
+                                                <label asp-for="Guests[i].age"
+                                                       class="form-label">
+                                                    Age
+                                                </label>
+
+                                                <input asp-for="Guests[i].age"
+                                                       type="number"
+                                                       class="form-control"
+                                                       min="0"
+                                                       max="120"
+                                                       placeholder="Age"
+                                                       required />
+
+                                                <span asp-validation-for="Guests[i].age"
+                                                      class="text-danger small"></span>
+                                            </div>
+                                        </div>
+                                    </div>}
+                                    </div>
+
+                            <button type="button"
+                                    class="btn btn-guest-secondary mb-4"
+                                    onclick="addGuest()">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                Add another guest
+                            </button>
+
+                            <div class="guest-note mb-4">
+                                <i class="bi bi-info-circle me-2"></i>
+                                Please make sure the details are correct before
+                                continuing to the booking summary.
+                            </div>
+
+                            <div class="d-flex flex-column flex-sm-row
+                                justify-content-between gap-3">
+                                <a asp-controller="Home"
+                                   asp-action="Index"
+                                   class="btn btn-guest-secondary">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Back
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-guest-primary">
+                                    Continue to summary
+                                    <i class="bi bi-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center text-muted small mt-4">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Your booking details are handled securely by RoyalVilla.
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function updateGuestIndexes() {
+            const container = document.getElementById('guestContainer');
+            const cards = container.querySelectorAll('.guest-entry');
+
+            cards.forEach((card, index) => {
+                const number = index + 1;
+
+                card.querySelector('.guest-number').textContent = number;
+                card.querySelector('.guest-title').textContent =
+                    'Guest ' + number;
+
+                card.querySelectorAll('[name]').forEach(input => {
+                    input.name = input.name.replace(
+                        /Guests\[\d+\]/g,
+                        'Guests[' + index + ']'
+                    );
+
+                    input.id = input.id.replace(
+                        /Guests_\d+__/g,
+                        'Guests_' + index + '__'
+                    );
+                });
+
+                card.querySelectorAll('label[for]').forEach(label => {
+                    label.htmlFor = label.htmlFor.replace(
+                        /Guests_\d+__/g,
+                        'Guests_' + index + '__'
+                    );
+                });
+
+                card.querySelectorAll('[data-valmsg-for]').forEach(span => {
+                    span.setAttribute(
+                        'data-valmsg-for',
+                        span.getAttribute('data-valmsg-for').replace(
+                            /Guests\[\d+\]/g,
+                            'Guests[' + index + ']'
+                        )
+                    );
+                });
+
+                let removeButton = card.querySelector('.btn-remove-guest');
+
+                if (index === 0 && removeButton) {
+                    removeButton.remove();
+                } else if (index > 0 && !removeButton) {
+                    const header = card.querySelector(
+                        '.d-flex.align-items-center.justify-content-between'
+                    );
+
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'btn-remove-guest';
+                    button.innerHTML =
+                        '<i class="bi bi-trash3 me-1"></i> Remove';
+                    button.onclick = function () {
+                        removeGuest(button);
+                    };
+
+                    header.appendChild(button);
+                }
+            });
+
+            document.getElementById('guestCount').textContent =
+                cards.length + (cards.length === 1 ? ' guest' : ' guests');
+        }
+
+        function addGuest() {
+            const container = document.getElementById('guestContainer');
+            const firstCard = container.querySelector('.guest-entry');
+            const newCard = firstCard.cloneNode(true);
+
+            newCard.querySelectorAll('input').forEach(input => {
+                input.value = '';
+            });
+
+            newCard.querySelectorAll('.text-danger').forEach(span => {
+                span.textContent = '';
+            });
+
+            container.appendChild(newCard);
+            updateGuestIndexes();
+        }
+
+        function removeGuest(button) {
+            const container = document.getElementById('guestContainer');
+
+            if (container.querySelectorAll('.guest-entry').length <= 1) {
+                return;
+            }
+
+            button.closest('.guest-entry').remove();
+            updateGuestIndexes();
+        }
+    </script>
+}

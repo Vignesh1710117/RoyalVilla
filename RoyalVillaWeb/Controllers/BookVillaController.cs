@@ -56,7 +56,12 @@ namespace RoyalVillaWeb.Controllers
                     $"{bookingVillaDTO.checkIn:dd MMM yyyy} to " +
                     $"{bookingVillaDTO.checkOut:dd MMM yyyy}.";
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Guest", new
+                    {
+                        bookVillaId = response.Data.BookVillaId,
+                        adult = bookingVillaDTO.adult,
+                        children = bookingVillaDTO.children
+                    });
                 }
                 ModelState.AddModelError(string.Empty, "Unable to submit your booking.");
             }
