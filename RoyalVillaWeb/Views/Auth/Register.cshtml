@@ -71,12 +71,10 @@
 							<span asp-validation-for="Role" class="text-danger"></span>
 						</div>
 
-						<!-- Submit Button -->
-						<div class="d-grid mb-3">
-							<button type="submit" class="btn btn-success btn-lg">
-								<i class="bi bi-check-circle me-2"></i>Create Account
-							</button>
-						</div>
+                        <select asp-for="Role" class="rv-register-select">
+                            <option value="Customer">Customer</option>
+                        </select>
+                    </div>
 
 						<!-- Divider -->
 						<hr class="my-4">
