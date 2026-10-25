@@ -150,8 +150,6 @@ var app = builder.Build();
 await SeedDataAsync(app);
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
     app.MapOpenApi("/openapi/{documentName}.json");
     var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
     app.MapScalarApiReference( option=>
@@ -173,7 +171,6 @@ if (app.Environment.IsDevelopment())
         //.AddDocument("V2", "Demo royal villa", "openapi/v2.json", isDefault: false);
     }
         );
-}
 
 app.UseStaticFiles();
 app.UseCors(o=>o.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("*"));
