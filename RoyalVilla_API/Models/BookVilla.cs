@@ -14,6 +14,8 @@ namespace RoyalVilla_API.Models
         public int children { get; set; }
         public int NumberOfNights { get; set; }
 
+        public ICollection<Guests> Guests { get; set; } = new List<Guests>();
+
         [Required]
         [ForeignKey(nameof(Villa))]
         public int villaId { get; set; }

@@ -266,6 +266,35 @@ namespace RoyalVilla_API.Migrations
                     b.ToTable("BookVillas");
                 });
 
+            modelBuilder.Entity("RoyalVilla_API.Models.Guests", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("age")
+                        .HasColumnType("int");
+
+                    b.Property<string>("firstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("lastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.ToTable("Guests");
+                });
+
             modelBuilder.Entity("RoyalVilla_API.Models.RefreshToken", b =>
                 {
                     b.Property<int>("Id")
@@ -536,6 +565,17 @@ namespace RoyalVilla_API.Migrations
                     b.Navigation("villa");
                 });
 
+            modelBuilder.Entity("RoyalVilla_API.Models.Guests", b =>
+                {
+                    b.HasOne("RoyalVilla_API.Models.BookVilla", "Booking")
+                        .WithMany("Guests")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
             modelBuilder.Entity("RoyalVilla_API.Models.VillaAmenities", b =>
                 {
                     b.HasOne("RoyalVilla_API.Models.Villa", "villa")
@@ -545,6 +585,11 @@ namespace RoyalVilla_API.Migrations
                         .IsRequired();
 
                     b.Navigation("villa");
+                });
+
+            modelBuilder.Entity("RoyalVilla_API.Models.BookVilla", b =>
+                {
+                    b.Navigation("Guests");
                 });
 
             modelBuilder.Entity("RoyalVilla_API.Models.Villa", b =>

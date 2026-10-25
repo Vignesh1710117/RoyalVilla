@@ -135,6 +135,9 @@ builder.Services.AddAutoMapper(o => {
     o.CreateMap<VillaAmentiesDTO, VillaAmenities>();
     o.CreateMap<BookVilla, BookVillaDTO>().ReverseMap();
     o.CreateMap<BookingVillaDTO, BookVillaDTO>().ReverseMap();
+    o.CreateMap<BookingGuestDTO, Guests>().ReverseMap();
+    o.CreateMap<AddBookingGuestsDTO, BookingGuestDTO>().ReverseMap();
+    o.CreateMap<AddBookingGuestsDTO, Guests>().ReverseMap();
 });
 
 builder.Services.AddScoped<IAuthService, AuthService>();

@@ -13,6 +13,7 @@ namespace RoyalVilla_API.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<BookVilla> BookVillas { get; set; }
+        public DbSet<Guests> Guests { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

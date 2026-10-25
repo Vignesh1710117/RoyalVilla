@@ -61,6 +61,7 @@ var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IVillaAmenitiesService, VillaAmenitiesService>();
     builder.Services.AddScoped<IBookingVilla, BookingVillaService>();
+    builder.Services.AddScoped<IGuest, GuestService>();
     //builder.Services.AddAuthorization();
     var app = builder.Build();
     
