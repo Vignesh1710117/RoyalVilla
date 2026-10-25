@@ -2,66 +2,571 @@
 @using RoyalVillaWeb
 
 @{
-    ViewData["Title"] = "Villa Details";
+    ViewData["Title"] = Model.Villa.Name + " | Villa Details";
 }
 
-<div class="container mt-4">
-    <h2>@Model.Villa.Name</h2>
+<style>
+    .rv-details-page {
+        --rv-green: #294b37;
+        --rv-dark: #193627;
+        --rv-cream: #f7f7f1;
+        --rv-muted: #7c877d;
+        --rv-border: #e5eae1;
+        background: var(--rv-cream);
+        min-height: 100vh;
+        padding: 42px 0 65px;
+        color: #29392e;
+    }
 
-    <div class="row mt-3">
-        <div class="col-md-6">
-            <img src="@SD.getImageURL(Model.Villa.ImageUrl)"
-                 alt="@Model.Villa.Name"
-                 class="img-fluid rounded"
-                 style="max-height: 350px; object-fit: cover;" />
+    .rv-breadcrumb {
+        font-size: .84rem;
+        color: var(--rv-muted);
+        margin-bottom: 26px;
+    }
+
+        .rv-breadcrumb a {
+            color: var(--rv-green);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+            .rv-breadcrumb a:hover {
+                text-decoration: underline;
+            }
+
+    .rv-details-heading {
+        color: var(--rv-dark);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(2.1rem, 4vw, 3.15rem);
+        font-weight: 400;
+        letter-spacing: -.8px;
+        overflow-wrap: anywhere;
+    }
+
+    .rv-details-kicker {
+        color: #82917e;
+        font-size: .72rem;
+        font-weight: 750;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .rv-details-rating {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: #e9f0e7;
+        color: var(--rv-green);
+        padding: 8px 13px;
+        border-radius: 30px;
+        font-size: .8rem;
+        font-weight: 650;
+    }
+
+    .rv-main-image-wrap {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        background: #e4e9df;
+        min-height: 280px;
+        box-shadow: 0 12px 35px rgba(31, 54, 37, .09);
+    }
+
+    .rv-main-image {
+        display: block;
+        width: 100%;
+        height: 440px;
+        object-fit: cover;
+        transition: transform .5s ease;
+    }
+
+    .rv-main-image-wrap:hover .rv-main-image {
+        transform: scale(1.025);
+    }
+
+    .rv-image-placeholder {
+        height: 350px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #718671;
+        font-size: 4rem;
+        background: linear-gradient(135deg, #edf1e7, #dbe5d6);
+    }
+
+    .rv-image-caption {
+        position: absolute;
+        bottom: 18px;
+        left: 18px;
+        background: rgba(24, 49, 34, .88);
+        color: #fff;
+        border: 1px solid rgba(255,255,255,.2);
+        border-radius: 9px;
+        padding: 10px 15px;
+        font-size: .8rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .rv-info-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid var(--rv-border);
+        border-radius: 18px;
+        padding: 27px;
+        box-shadow: 0 8px 25px rgba(31, 54, 37, .045);
+    }
+
+    .rv-info-title {
+        color: var(--rv-dark);
+        font-size: 1.22rem;
+        font-weight: 750;
+        margin-bottom: 22px;
+    }
+
+    .rv-price-label {
+        color: var(--rv-muted);
+        font-size: .78rem;
+        margin-bottom: 4px;
+    }
+
+    .rv-price-value {
+        color: var(--rv-green);
+        font-size: 2rem;
+        font-weight: 800;
+        letter-spacing: -.6px;
+    }
+
+    .rv-price-unit {
+        color: var(--rv-muted);
+        font-size: .82rem;
+        font-weight: 400;
+    }
+
+    .rv-info-divider {
+        border: 0;
+        border-top: 1px solid #edf0eb;
+        margin: 22px 0;
+    }
+
+    .rv-detail-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        margin-bottom: 19px;
+    }
+
+        .rv-detail-row:last-child {
+            margin-bottom: 0;
+        }
+
+    .rv-detail-icon {
+        width: 39px;
+        height: 39px;
+        flex: 0 0 39px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf3eb;
+        color: var(--rv-green);
+        border-radius: 11px;
+        font-size: 1rem;
+    }
+
+    .rv-detail-label {
+        display: block;
+        color: var(--rv-muted);
+        font-size: .76rem;
+        margin-bottom: 3px;
+    }
+
+    .rv-detail-value {
+        color: #2c4031;
+        font-size: .92rem;
+        font-weight: 650;
+        overflow-wrap: anywhere;
+    }
+
+    .rv-booking-note {
+        background: #f5f6ef;
+        border-radius: 12px;
+        padding: 14px;
+        color: #6e7e6e;
+        font-size: .8rem;
+        line-height: 1.7;
+    }
+
+    .rv-book-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        background: var(--rv-green);
+        color: #fff;
+        border: 1px solid var(--rv-green);
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: .92rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: .2s ease;
+    }
+
+        .rv-book-btn:hover {
+            background: var(--rv-dark);
+            border-color: var(--rv-dark);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+    .rv-back-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        border: 1px solid #dbe3d8;
+        border-radius: 10px;
+        background: #fff;
+        color: var(--rv-green);
+        padding: 12px 18px;
+        text-decoration: none;
+        font-size: .88rem;
+        font-weight: 650;
+        transition: .2s ease;
+    }
+
+        .rv-back-btn:hover {
+            background: #edf3eb;
+            color: var(--rv-dark);
+        }
+
+    .rv-section-heading {
+        color: var(--rv-dark);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: clamp(1.8rem, 3vw, 2.35rem);
+        font-weight: 400;
+    }
+
+    .rv-section-description {
+        color: var(--rv-muted);
+        font-size: .91rem;
+        line-height: 1.8;
+    }
+
+    .rv-amenity-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid var(--rv-border);
+        border-radius: 15px;
+        padding: 22px;
+        transition: transform .25s ease, box-shadow .25s ease;
+    }
+
+        .rv-amenity-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(31, 54, 37, .08);
+        }
+
+    .rv-amenity-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf3eb;
+        color: var(--rv-green);
+        border-radius: 12px;
+        font-size: 1.25rem;
+        margin-bottom: 16px;
+    }
+
+    .rv-amenity-name {
+        color: var(--rv-dark);
+        font-size: 1rem;
+        font-weight: 750;
+        margin-bottom: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .rv-amenity-description {
+        color: var(--rv-muted);
+        font-size: .85rem;
+        line-height: 1.75;
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .rv-empty-amenities {
+        background: #fff;
+        border: 1px dashed #d7e0d3;
+        border-radius: 15px;
+        padding: 30px 20px;
+        color: var(--rv-muted);
+        text-align: center;
+    }
+
+        .rv-empty-amenities i {
+            display: block;
+            color: #718671;
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+    @@media (max-width: 767.98px) {
+        .rv-details-page {
+            padding-top: 27px;
+        }
+
+        .rv-main-image {
+            height: 300px;
+        }
+
+        .rv-info-card {
+            padding: 22px;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .rv-main-image,
+        .rv-amenity-card,
+        .rv-book-btn {
+            transition: none;
+        }
+    }
+</style>
+
+<div class="rv-details-page">
+    <div class="container">
+
+        <!-- Breadcrumb -->
+        <nav class="rv-breadcrumb" aria-label="Breadcrumb">
+            <a asp-controller="Home" asp-action="Index">
+                <i class="bi bi-house-door me-1"></i> Home
+            </a>
+            <i class="bi bi-chevron-right mx-2"></i>
+            <span>Villa Details</span>
+        </nav>
+
+        <!-- Villa heading -->
+        <div class="d-flex flex-column flex-md-row
+            justify-content-between align-items-md-end gap-3 mb-4">
+
+            <div>
+                <div class="rv-details-kicker mb-2">
+                    DISCOVER YOUR NEXT ESCAPE
+                </div>
+
+                <h1 class="rv-details-heading mb-2">
+                    @Model.Villa.Name
+                </h1>
+
+                <div class="text-muted small">
+                    <i class="bi bi-geo-alt me-1"></i>
+                    A place to relax, recharge and reconnect
+                </div>
+            </div>
+
+            <div class="rv-details-rating">
+                <i class="bi bi-stars"></i>
+                RoyalVilla Collection
+            </div>
         </div>
 
-        <div class="col-md-6">
-            <h4>Villa Information</h4>
+        <!-- Main villa content -->
+        <div class="row g-4 align-items-stretch">
 
-            <p><strong>Villa ID:</strong> @Model.Villa.Id</p>
-            <p><strong>Description:</strong> @Model.Villa.Details</p>
-            <p><strong>Price:</strong> @Model.Villa.Rate</p>
-            <p><strong>Area:</strong> @Model.Villa.Sqft sq.ft.</p>
-            <p><strong>Occupancy:</strong> @Model.Villa.Occupancy</p>
-        </div>
-    </div>
+            <div class="col-lg-7">
+                <div class="rv-main-image-wrap h-100">
 
-    <hr />
-
-    <h3>Amenities</h3>
-
-    @if (Model.Amenities.Any())
-    {
-        <div class="row">
-            @foreach (var amenity in Model.Amenities)
-            {
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">@amenity.Name</h5>
-                            <p class="card-text">
-                                @(amenity.Description ?? "No description available")
-                            </p>
+                    @if (!string.IsNullOrWhiteSpace(Model.Villa.ImageUrl))
+                    {
+                        <img src="@SD.getImageURL(Model.Villa.ImageUrl)"
+                             alt="@Model.Villa.Name"
+                             class="rv-main-image" />
+                    }
+                    else
+                    {
+                        <div class="rv-image-placeholder">
+                            <i class="bi bi-house-heart"></i>
                         </div>
+                    }
+
+                    <div class="rv-image-caption">
+                        <i class="bi bi-house-heart me-2"></i>
+                        Your private getaway
                     </div>
                 </div>
-            }
+            </div>
+
+            <div class="col-lg-5">
+                <div class="rv-info-card">
+
+                    <div class="rv-price-label">Starting price</div>
+
+                    <div class="rv-price-value">
+                        ₹@Model.Villa.Rate.ToString("N0")
+                        <span class="rv-price-unit">/ night</span>
+                    </div>
+
+                    <hr class="rv-info-divider" />
+
+                    <h2 class="rv-info-title">Villa Information</h2>
+
+                    <div class="rv-detail-row">
+                        <div class="rv-detail-icon">
+                            <i class="bi bi-hash"></i>
+                        </div>
+                        <div>
+                            <span class="rv-detail-label">Villa ID</span>
+                            <div class="rv-detail-value">@Model.Villa.Id</div>
+                        </div>
+                    </div>
+
+                    <div class="rv-detail-row">
+                        <div class="rv-detail-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div>
+                            <span class="rv-detail-label">Maximum occupancy</span>
+                            <div class="rv-detail-value">
+                                @Model.Villa.Occupancy guests
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rv-detail-row">
+                        <div class="rv-detail-icon">
+                            <i class="bi bi-bounding-box"></i>
+                        </div>
+                        <div>
+                            <span class="rv-detail-label">Property area</span>
+                            <div class="rv-detail-value">
+                                @Model.Villa.Sqft.ToString("N0") sq. ft.
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="rv-info-divider" />
+
+                    <div class="rv-detail-label mb-2">About this villa</div>
+
+                    <p class="rv-section-description mb-4">
+                        @(string.IsNullOrWhiteSpace(Model.Villa.Details)
+                            ? "Explore this property and discover its amenities."
+                            : Model.Villa.Details)
+                    </p>
+
+                    <div class="rv-booking-note mb-4">
+                        <i class="bi bi-calendar-check me-2"></i>
+                        Choose your dates and guest details on the booking page.
+                        Availability is subject to confirmation.
+                    </div>
+
+                    <a asp-controller="BookVilla"
+                       asp-action="BookingPage"
+                       asp-route-id="@Model.Villa.Id"
+                       class="rv-book-btn">
+                        <i class="bi bi-calendar2-check"></i>
+                        Book This Villa
+                        <i class="bi bi-arrow-right ms-auto"></i>
+                    </a>
+
+                </div>
+            </div>
         </div>
-    }
-    else
-    {
-        <p>No amenities available for this villa.</p>
-    }
 
-    <a asp-controller="Home" asp-action="Index" class="btn btn-secondary mt-3">
-        Back to Villas
-    </a>
+        <!-- Description section -->
+        <section class="mt-5 pt-3">
+            <div class="rv-details-kicker mb-2">THE EXPERIENCE</div>
+            <h2 class="rv-section-heading mb-3">A space to call your own</h2>
 
-    <a asp-controller="BookVilla"
-       asp-action="BookingPage"
-       asp-route-id="@Model.Villa.Id"
-       class="btn btn-primary mt-3">
-        Book Now
-    </a>
+            <p class="rv-section-description" style="max-width: 800px;">
+                Discover the details that make this property special.
+                Explore the available amenities below to help plan your stay.
+            </p>
+        </section>
+
+        <!-- Amenities -->
+        <section class="mt-5">
+            <div class="d-flex flex-column flex-md-row
+                justify-content-between align-items-md-end gap-2 mb-4">
+
+                <div>
+                    <div class="rv-details-kicker mb-2">MADE FOR YOUR COMFORT</div>
+                    <h2 class="rv-section-heading mb-2">Villa Amenities</h2>
+                    <p class="rv-section-description mb-0">
+                        Explore the facilities available at this property.
+                    </p>
+                </div>
+
+                <span class="badge rounded-pill px-3 py-2"
+  style="background:#e9f0e7;color:#294b37;">
+<i class="bi bi-stars me-1"></i>
+@Model.Amenities.Count @(Model.Amenities.Count == 1
+                        ? "amenity"
+                                        : "amenities")
+                </span>
+            </div>
+
+            @if (Model.Amenities != null && Model.Amenities.Any())
+            {
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+
+                    @foreach (var amenity in Model.Amenities)
+                    {
+                        <div class="col">
+                            <article class="rv-amenity-card">
+                                <div class="rv-amenity-icon">
+                                    <i class="bi bi-check2-circle"></i>
+                                </div>
+
+                                <h3 class="rv-amenity-name">
+                                    @amenity.Name
+                                </h3>
+
+                                <p class="rv-amenity-description">
+                                    @(string.IsNullOrWhiteSpace(amenity.Description)
+                                        ? "More information about this amenity is not available."
+                                        : amenity.Description)
+                                </p>
+                            </article>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="rv-empty-amenities">
+                    <i class="bi bi-stars"></i>
+                    <h3 class="h5 fw-bold mb-2">Amenities coming soon</h3>
+                    <p class="mb-0">
+                        No amenities have been listed for this villa yet.
+                    </p>
+                </div>
+            }
+        </section>
+
+        <!-- Bottom actions -->
+        <div class="d-flex flex-column flex-sm-row
+            justify-content-between align-items-sm-center gap-3 mt-5 pt-4"
+             style="border-top:1px solid #e5eae1;">
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="rv-back-btn">
+                <i class="bi bi-arrow-left"></i>
+                Back to Villas
+            </a>
+
+            <a asp-controller="BookVilla"
+               asp-action="BookingPage"
+               asp-route-id="@Model.Villa.Id"
+               class="rv-book-btn"
+               style="width:auto;">
+                Book Now
+                <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+
+    </div>
 </div>

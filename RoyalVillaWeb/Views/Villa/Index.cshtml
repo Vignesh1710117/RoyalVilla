@@ -1,175 +1,462 @@
-﻿﻿@using RoyalVilla.DTO
+﻿@using RoyalVilla.DTO
+@using RoyalVillaWeb
 @model IEnumerable<VillaDTO>
 
-<div class="container my-4 pb-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1">Villa Management</h2>
-            <p class="text-muted mb-0">Manage your villa listings</p>
-        </div>
-        <a asp-controller="villa" asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-circle me-2"></i>Add New Villa
-        </a>
-    </div>
+@{
+    ViewData["Title"] = "Villa Management";
+    var villas = Model?.ToList() ?? new List<VillaDTO>();
+}
 
-    <!-- Messages -->
-    @if (TempData["success"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle me-2"></i> @TempData["success"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    }
-    @if (TempData["error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>@TempData["error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+<style>
+    .villa-dashboard {
+        background: #f5f6f2;
+        min-height: 100vh;
+        padding: 42px 0 60px;
+        color: #263b2e;
     }
 
-    @if (Model == null || !Model.Any())
-    {
-        <div class="alert alert-info text-center">
-            <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
-            <h5>No Villas Available</h5>
-            <p class="mb-3">Get started by creating your first villa.</p>
-            <a asp-action="Create" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create Villa
+    .dashboard-eyebrow {
+        color: #718474;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .dashboard-title {
+        color: #243d2e;
+        font-size: clamp(2rem, 4vw, 2.65rem);
+        font-weight: 750;
+        letter-spacing: -1.2px;
+    }
+
+    .dashboard-subtitle {
+        color: #818a81;
+    }
+
+    .btn-add-villa {
+        background: #284b36;
+        color: white;
+        border: 1px solid #284b36;
+        border-radius: 11px;
+        padding: 12px 18px;
+        font-weight: 600;
+    }
+
+        .btn-add-villa:hover {
+            background: #1d3828;
+            color: white;
+        }
+
+    .dashboard-card {
+        background: #fff;
+        border: 1px solid #e7ebe4;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(35, 56, 42, .045);
+        overflow: hidden;
+    }
+
+    .villa-table {
+        margin-bottom: 0;
+        vertical-align: middle;
+    }
+
+        .villa-table thead th {
+            background: #f7f8f5;
+            color: #778378;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            padding: 17px 16px;
+            border-bottom: 1px solid #e8ece5;
+            white-space: nowrap;
+        }
+
+        .villa-table tbody td {
+            padding: 16px;
+            border-color: #edf0eb;
+        }
+
+        .villa-table tbody tr:hover {
+            background: #fafbf8;
+        }
+
+    .villa-thumb {
+        width: 76px;
+        height: 58px;
+        object-fit: cover;
+        border-radius: 10px;
+        background: #edf0e9;
+    }
+
+    .villa-name {
+        color: #2d4635;
+        font-weight: 700;
+    }
+
+    .villa-description {
+        color: #838b83;
+        font-size: .86rem;
+        line-height: 1.5;
+        min-width: 180px;
+        max-width: 270px;
+    }
+
+    .price-badge {
+        display: inline-block;
+        padding: 7px 10px;
+        border-radius: 8px;
+        background: #edf5ed;
+        color: #2f6540;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .villa-meta {
+        color: #536557;
+        white-space: nowrap;
+    }
+
+    .action-btn {
+        width: 35px;
+        height: 35px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 9px;
+    }
+
+    .stats-heading {
+        font-size: 1.2rem;
+        font-weight: 750;
+        color: #2a4031;
+    }
+
+    .stat-card {
+        height: 100%;
+        background: #fff;
+        border: 1px solid #e7ebe4;
+        border-radius: 16px;
+        padding: 23px;
+        box-shadow: 0 8px 25px rgba(35, 56, 42, .035);
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.3rem;
+        background: #edf4eb;
+        color: #376347;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+        font-weight: 750;
+        letter-spacing: -.6px;
+        color: #294533;
+        margin: 15px 0 3px;
+    }
+
+    .stat-label {
+        color: #858d85;
+        font-size: .88rem;
+    }
+
+    .empty-state {
+        padding: 65px 20px;
+        text-align: center;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        color: #739078;
+    }
+
+    @@media (max-width: 767px) {
+        .villa-dashboard {
+            padding-top: 28px;
+        }
+
+        .dashboard-header {
+            align-items: flex-start !important;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .btn-add-villa {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="villa-dashboard">
+    <div class="container">
+
+        <!-- Dashboard header -->
+        <div class="dashboard-header d-flex justify-content-between
+            align-items-center mb-4 mb-lg-5">
+
+            <div>
+                <div class="dashboard-eyebrow mb-2">
+                    ROYALVILLA · ADMINISTRATION
+                </div>
+
+                <h1 class="dashboard-title mb-2">
+                    Villa Management
+                </h1>
+
+                <p class="dashboard-subtitle mb-0">
+                    Manage your properties, pricing and occupancy.
+                </p>
+            </div>
+
+            <a asp-controller="Villa"
+               asp-action="Create"
+               class="btn btn-add-villa">
+                <i class="bi bi-plus-lg me-2"></i>
+                Add New Villa
             </a>
         </div>
-    }
-    else
-    {
-        @if (Model.Count() > 0)
+
+        <!-- Notifications -->
+        @if (TempData["success"] != null)
         {
-            <div class="card">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Image</th>
-                                    <th>Name</th>
-                                    <th>Details</th>
-                                    <th>Rate</th>
-                                    <th>Occupancy</th>
-                                    <th>Sqft</th>
-
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var villa in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            @* @if (!string.IsNullOrEmpty(villa.ImageUrl))
-                                            { *@
-                                                <img src="@SD.getImageURL(villa.ImageUrl)" class="rounded" style="width: 60px; height: 45px; object-fit: cover;">
-                                            @* } *@
-                                            @* else
-                                            {
-                                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center text-white"
-                                                     style="width: 60px; height: 45px;">
-                                                    <i class="bi bi-image"></i>
-                                                </div>
-                                            } *@
-                                        </td>
-                                        <td class="align-middle">
-                                            <strong>@villa.Name</strong>
-                                        </td>
-                                        <td class="align-middle">
-                                            <small class="text-muted">
-                                                @if (string.IsNullOrEmpty(villa.Details))
-                                                {
-                                                    <span class="fst-italic">No details</span>
-                                                }
-                                                else
-                                                {
-                                                    @(villa.Details.Length > 50 ? villa.Details.Substring(0, 50) + "..." : villa.Details)
-                                                }
-                                            </small>
-                                        </td>
-                                        <td class="align-middle">
-                                            <span class="badge bg-success">$@villa.Rate.ToString("N0")</span>
-                                        </td>
-                                        <td class="align-middle">
-                                            <i class="bi bi-people me-1"></i>@villa.Occupancy
-                                        </td>
-                                        <td class="align-middle">
-                                            <i class="bi bi-rulers me-1"></i>@villa.Sqft
-                                        </td>
-
-                                        <td class="align-middle text-center">
-                                            <div class="btn-group btn-group-sm">
-
-                                                <a asp-action="edit" asp-route-id="@villa.Id"
-                                                   class="btn btn-outline-warning" title="Edit">
-                                                    <i class="bi bi-pencil"></i>
-                                                </a>
-                                                <a asp-action="delete" asp-route-id="@villa.Id"
-                                                   class="btn btn-outline-danger" title="delete">
-                                                    <i class="bi bi-trash"></i>
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="alert alert-success alert-dismissible fade show
+                rounded-3 border-0 shadow-sm"
+                 role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                @TempData["success"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
             </div>
         }
-        <!-- Summary -->
-        <div class="row mt-5 mb-5">
-            <div class="col-12">
-                <div class="card shadow-lg border-0 stats-card">
-                    <div class="card-body p-4">
-                        <h3 class="text-center mb-4 fw-bold">At a Glance</h3>
-                        <div class="row text-center g-4">
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <i class="bi bi-house-heart-fill text-primary fs-1 mb-3"></i>
-                                    <h3 class="text-primary fw-bold mb-1">@Model.Count()</h3>
-                                    <p class="text-muted mb-0">Total Villas</p>
-                                </div>
+
+        @if (TempData["error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show
+                rounded-3 border-0 shadow-sm"
+                 role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                @TempData["error"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (villas.Count == 0)
+        {
+            <div class="dashboard-card empty-state">
+                <i class="bi bi-houses empty-icon"></i>
+
+                <h3 class="mt-3 fw-bold">No villas yet</h3>
+
+                <p class="text-muted mb-4">
+                    Add your first villa to start managing your listings.
+                </p>
+
+                <a asp-controller="Villa"
+                   asp-action="Create"
+                   class="btn btn-add-villa">
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Create Your First Villa
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- Villa listing -->
+            <div class="dashboard-card mb-5">
+                <div class="p-4 d-flex justify-content-between
+                    align-items-center flex-wrap gap-2">
+
+                    <div>
+                        <h2 class="stats-heading mb-1">
+                            All Properties
+                        </h2>
+                        <p class="dashboard-subtitle mb-0">
+                            Your current villa listings
+                        </p>
+                    </div>
+
+                    <span class="price-badge">
+                        @villas.Count @(villas.Count == 1 ? "Villa" : "Villas")
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover villa-table">
+                        <thead>
+                            <tr>
+                                <th>Property</th>
+                                <th>Villa Details</th>
+                                <th>Rate / Night</th>
+                                <th>Guests</th>
+                                <th>Area</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var villa in villas)
+                            {
+                                <tr>
+                                    <td>
+                                        <img src="@SD.getImageURL(villa.ImageUrl)"
+                                             alt="@villa.Name"
+                                             class="villa-thumb" />
+                                    </td>
+
+                                    <td>
+                                        <div class="villa-name mb-1">
+                                            @villa.Name
+                                        </div>
+
+                                        <div class="villa-description">
+                                            @if (string.IsNullOrWhiteSpace(villa.Details))
+                                            {
+                                                <span class="fst-italic">
+                                                    No details available
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                @(villa.Details.Length > 65
+                                                    ? villa.Details.Substring(0, 65) + "..."
+                                                    : villa.Details)
+                                            }
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <span class="price-badge">
+                                            ₹@villa.Rate.ToString("N0")
+                                        </span>
+                                    </td>
+
+                                    <td class="villa-meta">
+                                        <i class="bi bi-people me-1"></i>
+                                        @villa.Occupancy
+                                    </td>
+
+                                    <td class="villa-meta">
+                                        <i class="bi bi-arrows-fullscreen me-1"></i>
+                                        @villa.Sqft.ToString("N0") sq.ft.
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <a asp-controller="Villa"
+                                               asp-action="Edit"
+                                               asp-route-id="@villa.Id"
+                                               class="btn btn-outline-success
+                                                btn-sm action-btn"
+                                               title="Edit villa"
+                                               aria-label="Edit villa">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+
+                                            <a asp-controller="Villa"
+                                               asp-action="Delete"
+                                               asp-route-id="@villa.Id"
+                                               class="btn btn-outline-danger
+                                                btn-sm action-btn"
+                                               title="Delete villa"
+                                               aria-label="Delete villa">
+                                                <i class="bi bi-trash3"></i>
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <div class="mb-4">
+                <div class="mb-3">
+                    <div class="dashboard-eyebrow mb-2">
+                        PROPERTY OVERVIEW
+                    </div>
+                    <h2 class="stats-heading mb-0">At a glance</h2>
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-house-heart"></i>
                             </div>
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <i class="bi bi-cash-coin text-success fs-1 mb-3"></i>
-                                    <h3 class="text-success fw-bold mb-1">$@Model.Min(v => v.Rate).ToString("N0")</h3>
-                                    <p class="text-muted mb-0">Starting From</p>
-                                </div>
+
+                            <div class="stat-value">
+                                @villas.Count
                             </div>
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <i class="bi bi-people-fill text-info fs-1 mb-3"></i>
-                                    <h3 class="text-info fw-bold mb-1">@Model.Max(v => v.Occupancy)</h3>
-                                    <p class="text-muted mb-0">Max Occupancy</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="stat-item">
-                                    <i class="bi bi-arrows-fullscreen text-warning fs-1 mb-3"></i>
-                                    <h3 class="text-warning fw-bold mb-1">@Model.Sum(v => v.Sqft).ToString("N0")</h3>
-                                    <p class="text-muted mb-0">Total Sqft</p>
-                                </div>
+
+                            <div class="stat-label">
+                                Total Villas
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+
+                            <div class="stat-value">
+                                ₹@villas.Min(v => v.Rate).ToString("N0")
+                            </div>
+
+                            <div class="stat-label">
+                                Starting Price / Night
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+
+                            <div class="stat-value">
+                                @villas.Max(v => v.Occupancy)
+                            </div>
+
+                            <div class="stat-label">
+                                Highest Guest Capacity
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-bounding-box"></i>
+                            </div>
+
+                            <div class="stat-value">
+                                @villas.Sum(v => v.Sqft).ToString("N0")
+                            </div>
+
+                            <div class="stat-label">
+                                Combined Area (sq.ft.)
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </div>
-
-    }
-
+        }
+    </div>
 </div>
-
-<style>
-    .object-fit-cover {
-        object-fit: cover;
-    }
-</style>
