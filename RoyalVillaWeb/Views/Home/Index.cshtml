@@ -1,361 +1,793 @@
-﻿﻿@using RoyalVilla.DTO
+﻿
+@using RoyalVilla.DTO
+@using RoyalVillaWeb
 @model IEnumerable<VillaDTO>
 
+@{
+    ViewData["Title"] = "Discover Luxury Villas";
+    var villas = Model?.ToList() ?? new List<VillaDTO>();
+}
 
-<!-- Hero Carousel Section -->
-<div id="heroCarousel" class="carousel slide carousel-fade mb-5" data-bs-ride="carousel">
-    <div class="carousel-indicators">
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
-    </div>
-    <div class="carousel-inner">
-        <div class="carousel-item active">
-            <div class="carousel-slide" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <div class="carousel-caption-custom">
-                    <h1 class="display-3 fw-bold mb-4 animate-fade-in">Welcome to Luxury Villas</h1>
-                    <p class="lead mb-4 fs-4">Discover your perfect getaway in paradise</p>
-                    <a href="#villa-listings" class="btn btn-light btn-lg px-5 smooth-scroll">
-                        <i class="bi bi-arrow-down-circle"></i> Explore Villas
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="carousel-item">
-            <div class="carousel-slide" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <div class="carousel-caption-custom">
-                    <h1 class="display-3 fw-bold mb-4 animate-fade-in">Premium Amenities</h1>
-                    <p class="lead mb-4 fs-4">Experience luxury living at its finest</p>
-                    <a href="#villa-listings" class="btn btn-light btn-lg px-5 smooth-scroll">
-                        <i class="bi bi-star-fill"></i> View Collection
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class="carousel-item">
-            <div class="carousel-slide" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <div class="carousel-caption-custom">
-                    <h1 class="display-3 fw-bold mb-4 animate-fade-in">Book Your Dream Villa</h1>
-                    <p class="lead mb-4 fs-4">Unforgettable memories await you</p>
-                    <a href="#villa-listings" class="btn btn-light btn-lg px-5 smooth-scroll">
-                        <i class="bi bi-calendar-check"></i> Check Availability
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Previous</span>
-    </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="visually-hidden">Next</span>
-    </button>
-</div>
-
-<div class="container mt-4" id="villa-listings">
-    <!-- Header Section -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="text-center">
-                <h2 class="display-4 fw-bold text-primary">
-                    <i class="bi bi-house-door-fill"></i> Luxury Villa Collection
-                </h2>
-                <p class="lead text-muted">Browse our exclusive selection of premium properties</p>
-                <div class="divider-custom">
-                    <div class="divider-line"></div>
-                    <div class="divider-icon"><i class="bi bi-gem"></i></div>
-                    <div class="divider-line"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (TempData["error"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill"></i> @TempData["error"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    @if (Model == null || !Model.Any())
-    {
-        <div class="row">
-            <div class="col-12">
-                <div class="alert alert-info text-center" role="alert">
-                    <i class="bi bi-info-circle-fill fs-1 d-block mb-3"></i>
-                    <h4>No Villas Available</h4>
-                    <p class="mb-0">There are currently no villas to display. Please check back later!</p>
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        @if (Model.Count() > 0)
-        {
-
-            
-            <!-- Villa Cards Grid -->
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-                @foreach (var villa in Model)
-                {
-                    <div class="col">
-                        <div class="card h-100 shadow-sm hover-shadow transition">
-                            <!-- Villa Image -->
-                            <div class="position-relative overflow-hidden">
-                                @* @if (!string.IsNullOrEmpty(villa.ImageUrl))
-                                { *@
-                                    <img src="@SD.getImageURL(villa.ImageUrl)" class="card-img-top villa-image" style="height: 250px; object-fit: cover;">
-                                @* } *@
-                                @* else
-                                {
-                                    <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center" style="height: 250px;">
-                                        <i class="bi bi-image text-white" style="font-size: 4rem;"></i>
-                                    </div>
-                                } *@
-
-                           
-                                <!-- Price Badge -->
-                                <div class="position-absolute top-0 end-0 m-3">
-                                    <span class="badge bg-success fs-6 px-3 py-2 rounded-pill shadow">
-                                        $@villa.Rate.ToString("N0")/night
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Card Body -->
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-primary fw-bold mb-3">@villa.Name</h5>
-
-                                <p class="card-text text-muted flex-grow-1">
-                                    @villa.Details
-                                </p>
-
-                                <!-- Villa Details -->
-                                <div class="mb-3">
-                                    <div class="row g-2">
-                                        <div class="col-6">
-                                            <div class="d-flex align-items-center">
-                                                <i class="bi bi-people-fill m-1"></i>
-                                                <small class="text-muted">@villa.Occupancy Guests</small>
-                                            </div>
-                                        </div>
-                                        <div class="col-6">
-                                            <div class="d-flex align-items-center float-end">
-                                                <i class="bi bi-house  m-1"></i>
-                                                <small class="text-muted">@villa.Sqft sqft</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Action Buttons -->
-                                <div class="d-grid gap-2">
-
-                                    <a asp-controller="VillaAmenities"
-                                       asp-action="Details"
-                                       asp-route-id="@villa.Id"
-                                       class="btn btn-outline-primary">
-                                        <i class="bi bi-info-circle"></i> View Details
-                                    </a>
-
-                                    <a href="mailto:vignesh@gmail.com"
-                                       class="btn btn-primary btn-hover">
-                                        <i class="bi bi-envelope"></i> Contact Us
-                                    </a>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                }
-            </div>
-            <!-- Statistics Section -->
-            <div class="row mt-5 mb-5">
-                <div class="col-12">
-                    <div class="card shadow-lg border-0 stats-card">
-                        <div class="card-body p-4">
-                            <h3 class="text-center mb-4 fw-bold">At a Glance</h3>
-                            <div class="row text-center g-4">
-                                <div class="col-md-3">
-                                    <div class="stat-item">
-                                        <i class="bi bi-house-heart-fill text-primary fs-1 mb-3"></i>
-                                        <h3 class="text-primary fw-bold mb-1">@Model.Count()</h3>
-                                        <p class="text-muted mb-0">Total Villas</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="stat-item">
-                                        <i class="bi bi-cash-coin text-success fs-1 mb-3"></i>
-                                        <h3 class="text-success fw-bold mb-1">$@Model.Min(v => v.Rate).ToString("N0")</h3>
-                                        <p class="text-muted mb-0">Starting From</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="stat-item">
-                                        <i class="bi bi-people-fill text-info fs-1 mb-3"></i>
-                                        <h3 class="text-info fw-bold mb-1">@Model.Max(v => v.Occupancy)</h3>
-                                        <p class="text-muted mb-0">Max Occupancy</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="stat-item">
-                                        <i class="bi bi-arrows-fullscreen text-warning fs-1 mb-3"></i>
-                                        <h3 class="text-warning fw-bold mb-1">@Model.Sum(v => v.Sqft).ToString("N0")</h3>
-                                        <p class="text-muted mb-0">Total Sqft</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    }
-
-   
-</div>
-
-<!-- Custom Styles -->
 <style>
-    /* Carousel Styles */
-    .carousel-slide {
-        height: 500px;
+    :root {
+        --rv-green: #294b37;
+        --rv-green-dark: #1e3829;
+        --rv-green-light: #e9f0e7;
+        --rv-cream: #f7f7f1;
+        --rv-text: #29392e;
+        --rv-muted: #7c877d;
+        --rv-border: #e7ebe3;
+    }
+
+    .rv-home {
+        background: var(--rv-cream);
+        color: var(--rv-text);
+        min-height: 100vh;
+        padding-bottom: 40px;
+    }
+
+    /* Hero carousel */
+    .rv-hero {
+        position: relative;
+        overflow: hidden;
+        background: var(--rv-green-dark);
+    }
+
+    .rv-hero .carousel-slide {
+        min-height: 490px;
+        padding: 70px 22px;
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
+        isolation: isolate;
     }
 
-    .carousel-caption-custom {
+    .rv-hero .carousel-slide::before,
+    .rv-hero .carousel-slide::after {
+        content: "";
+        position: absolute;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .rv-hero .carousel-slide::before {
+        inset: 0;
+        background:
+            radial-gradient(ellipse at 15% 15%, rgba(210, 222, 182, .18), transparent 45%),
+            linear-gradient(120deg, #172e21, #31563d 58%, #667958);
+    }
+
+    .rv-hero .slide-two::before {
+        background:
+            radial-gradient(ellipse at 80% 25%, rgba(229, 213, 166, .25), transparent 40%),
+            linear-gradient(120deg, #263d2d, #587052 60%, #879176);
+    }
+
+    .rv-hero .slide-three::before {
+        background:
+            radial-gradient(ellipse at 25% 75%, rgba(205, 219, 183, .2), transparent 42%),
+            linear-gradient(120deg, #1a3023, #355640 55%, #7b8465);
+    }
+
+    .rv-hero .carousel-slide::after {
+        width: 390px;
+        height: 390px;
+        border: 1px solid rgba(255, 255, 255, .13);
+        border-radius: 50%;
+        right: -90px;
+        top: -145px;
+        box-shadow: 0 0 0 35px rgba(255,255,255,.025),
+                    0 0 0 75px rgba(255,255,255,.02);
+    }
+
+    .rv-hero-content {
+        width: 100%;
+        max-width: 850px;
         text-align: center;
         color: white;
-        z-index: 10;
-        animation: fadeInUp 1s ease-in-out;
-    }
-
-    @@keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .carousel-fade .carousel-item {
-        transition: opacity 1s ease-in-out;
-    }
-
-    .carousel-control-prev-icon,
-    .carousel-control-next-icon {
-        background-color: rgba(0, 0, 0, 0.5);
-        border-radius: 50%;
         padding: 20px;
     }
 
-    /* Divider Styles */
-    .divider-custom {
+    .rv-hero-eyebrow {
+        display: inline-block;
+        border: 1px solid rgba(255,255,255,.35);
+        border-radius: 50px;
+        padding: 8px 17px;
+        margin-bottom: 24px;
+        color: #e6ebd9;
+        font-size: .73rem;
+        font-weight: 700;
+        letter-spacing: 2px;
+    }
+
+    .rv-hero-content h1 {
+        font-size: clamp(2.25rem, 5vw, 4.1rem);
+        font-weight: 750;
+        line-height: 1.12;
+        letter-spacing: -1.5px;
+        margin-bottom: 22px;
+    }
+
+    .rv-hero-content p {
+        max-width: 620px;
+        margin: 0 auto 30px;
+        color: rgba(255,255,255,.83);
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        line-height: 1.8;
+    }
+
+    .rv-hero-btn {
+        background: #f4f1e5;
+        color: var(--rv-green-dark);
+        border: 1px solid #f4f1e5;
+        border-radius: 9px;
+        padding: 13px 25px;
+        font-weight: 700;
+        transition: .25s ease;
+    }
+
+    .rv-hero-btn:hover {
+        background: white;
+        border-color: white;
+        color: var(--rv-green-dark);
+        transform: translateY(-2px);
+    }
+
+    .rv-hero .carousel-indicators {
+        margin-bottom: 24px;
+    }
+
+    .rv-hero .carousel-indicators [data-bs-target] {
+        width: 25px;
+        height: 4px;
+        border: 0;
+        border-radius: 8px;
+    }
+
+    .rv-hero .carousel-control-prev,
+    .rv-hero .carousel-control-next {
+        width: 8%;
+    }
+
+    .rv-hero .carousel-control-prev-icon,
+    .rv-hero .carousel-control-next-icon {
+        background-color: rgba(255,255,255,.16);
+        border: 1px solid rgba(255,255,255,.25);
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        background-size: 45%;
+    }
+
+    /* Search-style intro strip */
+    .rv-intro-strip {
+        max-width: 1100px;
+        margin: -1px auto 0;
+        padding: 23px 25px;
+        background: #fff;
+        border: 1px solid var(--rv-border);
+        border-radius: 0 0 17px 17px;
+        box-shadow: 0 8px 25px rgba(36, 58, 42, .035);
+    }
+
+    .rv-intro-item {
         display: flex;
         align-items: center;
-        margin: 2rem 0;
+        gap: 12px;
+        justify-content: center;
     }
 
-    .divider-line {
-        flex: 1;
-        height: 2px;
-        background: linear-gradient(90deg, transparent, #667eea, transparent);
+    .rv-intro-icon {
+        width: 43px;
+        height: 43px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--rv-green-light);
+        color: var(--rv-green);
+        border-radius: 12px;
+        font-size: 1.2rem;
+        flex-shrink: 0;
     }
 
-    .divider-icon {
-        padding: 0 1rem;
-        font-size: 1.5rem;
-        color: #667eea;
+    .rv-intro-item strong {
+        display: block;
+        font-size: .9rem;
     }
 
-    /* Card Hover Effects */
-    .hover-shadow {
-        transition: all 0.3s ease-in-out;
-        border-radius: 15px;
+    .rv-intro-item small {
+        color: var(--rv-muted);
+        font-size: .78rem;
     }
 
-    .hover-shadow:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 1.5rem 4rem rgba(0,0,0,.2) !important;
+    /* Listings */
+    .rv-listings {
+        padding-top: 75px;
     }
 
-    .villa-image {
-        transition: transform 0.5s ease-in-out;
+    .rv-eyebrow {
+        color: #71846e;
+        font-size: .72rem;
+        font-weight: 750;
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
 
-    .card:hover .villa-image {
-        transform: scale(1.1);
+    .rv-section-title {
+        color: var(--rv-green-dark);
+        font-size: clamp(1.9rem, 4vw, 2.7rem);
+        font-weight: 750;
+        letter-spacing: -1px;
     }
 
-    .card {
-        border: none;
+    .rv-section-subtitle {
+        color: var(--rv-muted);
+        max-width: 580px;
+        margin: 0 auto;
+        line-height: 1.8;
+    }
+
+    .rv-listing-count {
+        color: var(--rv-green);
+        background: var(--rv-green-light);
+        border-radius: 30px;
+        padding: 8px 14px;
+        font-size: .8rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    /* Villa cards */
+    .rv-villa-card {
+        height: 100%;
+        background: white;
+        border: 1px solid var(--rv-border);
+        border-radius: 17px;
         overflow: hidden;
-        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(33, 55, 38, .035);
+        transition: transform .3s ease, box-shadow .3s ease;
     }
 
-    .transition {
-        transition: all 0.3s ease;
+    .rv-villa-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px rgba(33, 55, 38, .11);
     }
 
-    /* Button Hover Effect */
-    .btn-hover {
+    .rv-villa-image-wrap {
+        height: 245px;
         position: relative;
         overflow: hidden;
-        transition: all 0.3s ease;
+        background: #e7ece3;
     }
 
-    .btn-hover:hover {
-        transform: scale(1.02);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    .rv-villa-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .55s ease;
     }
 
-    /* Stats Card */
-    .stats-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    .rv-villa-card:hover .rv-villa-image {
+        transform: scale(1.055);
+    }
+
+    .rv-image-placeholder {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #718671;
+        font-size: 3rem;
+        background: linear-gradient(135deg, #edf1e7, #dbe5d6);
+    }
+
+    .rv-price-badge {
+        position: absolute;
+        right: 14px;
+        top: 14px;
+        background: rgba(255,255,255,.96);
+        color: var(--rv-green-dark);
+        border-radius: 9px;
+        padding: 9px 13px;
+        font-size: .84rem;
+        font-weight: 750;
+        box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .rv-villa-card-body {
+        padding: 23px;
+        display: flex;
+        flex-direction: column;
+        min-height: 285px;
+    }
+
+    .rv-villa-name {
+        color: var(--rv-green-dark);
+        font-size: 1.2rem;
+        font-weight: 750;
+        margin-bottom: 11px;
+    }
+
+    .rv-villa-description {
+        color: var(--rv-muted);
+        font-size: .9rem;
+        line-height: 1.75;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        min-height: 72px;
+        margin-bottom: 19px;
+    }
+
+    .rv-villa-features {
+        display: flex;
+        gap: 17px;
+        flex-wrap: wrap;
+        padding: 14px 0;
+        margin-top: auto;
+        border-top: 1px solid #edf0eb;
+        color: #647267;
+        font-size: .82rem;
+    }
+
+    .rv-villa-features i {
+        color: #65806a;
+        margin-right: 5px;
+    }
+
+    .rv-details-btn {
+        background: var(--rv-green);
+        color: white;
+        border: 1px solid var(--rv-green);
+        border-radius: 9px;
+        padding: 11px 15px;
+        font-weight: 650;
+        transition: .2s ease;
+    }
+
+    .rv-details-btn:hover {
+        background: var(--rv-green-dark);
+        color: white;
+        border-color: var(--rv-green-dark);
+    }
+
+    .rv-contact-btn {
+        background: white;
+        color: var(--rv-green);
+        border: 1px solid #dce5d9;
+        border-radius: 9px;
+        padding: 10px 15px;
+        font-weight: 650;
+    }
+
+    .rv-contact-btn:hover {
+        background: var(--rv-green-light);
+        color: var(--rv-green-dark);
+    }
+
+    /* Empty state and alerts */
+    .rv-empty-state {
+        background: white;
+        border: 1px dashed #d5dfd2;
+        border-radius: 18px;
+        padding: 55px 20px;
+        text-align: center;
+    }
+
+    .rv-empty-icon {
+        width: 75px;
+        height: 75px;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: var(--rv-green-light);
+        color: var(--rv-green);
+        font-size: 2rem;
+    }
+
+    .rv-alert {
+        border: 0;
+        border-radius: 12px;
+    }
+
+    /* Statistics */
+    .rv-stats {
+        background: white;
+        border: 1px solid var(--rv-border);
+        border-radius: 18px;
+        padding: 35px 24px;
+        box-shadow: 0 8px 25px rgba(36, 58, 42, .04);
+    }
+
+    .rv-stat-item {
+        padding: 12px;
+        height: 100%;
+    }
+
+    .rv-stat-icon {
+        width: 53px;
+        height: 53px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
         border-radius: 15px;
+        background: var(--rv-green-light);
+        color: var(--rv-green);
+        font-size: 1.45rem;
     }
 
-    .stat-item {
-        padding: 1rem;
-        transition: transform 0.3s ease;
+    .rv-stat-value {
+        color: var(--rv-green-dark);
+        font-size: clamp(1.45rem, 3vw, 2rem);
+        font-weight: 750;
+        overflow-wrap: anywhere;
     }
 
-    .stat-item:hover {
-        transform: translateY(-5px);
+    .rv-stat-label {
+        color: var(--rv-muted);
+        font-size: .85rem;
+        margin: 0;
     }
 
-    /* Background Gradient */
-    .bg-gradient-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    .rv-bottom-note {
+        color: #8a9488;
+        font-size: .82rem;
     }
 
-    /* Smooth Scroll */
-    .smooth-scroll {
-        scroll-behavior: smooth;
-    }
-
-    /* Responsive adjustments */
-    @@media (max-width: 768px) {
-        .carousel-slide {
-            height: 400px;
+    @@media (max-width: 767.98px) {
+        .rv-hero .carousel-slide {
+            min-height: 410px;
+            padding: 55px 20px;
         }
 
-        .carousel-caption-custom h1 {
-            font-size: 2rem;
+        .rv-hero .carousel-control-prev,
+        .rv-hero .carousel-control-next {
+            width: 10%;
         }
 
-        .carousel-caption-custom p {
-            font-size: 1rem;
+        .rv-intro-strip {
+            margin: 0 12px;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .rv-intro-item {
+            justify-content: flex-start;
+            padding: 8px 0;
+        }
+
+        .rv-listings {
+            padding-top: 50px;
+        }
+
+        .rv-villa-image-wrap {
+            height: 230px;
+        }
+    }
+
+    @@media (prefers-reduced-motion: reduce) {
+        .rv-villa-card,
+        .rv-villa-image,
+        .rv-details-btn,
+        .rv-hero-btn {
+            transition: none;
         }
     }
 </style>
+
+<div class="rv-home">
+
+    <!-- Hero carousel -->
+    <section class="rv-hero">
+        <div id="heroCarousel"
+             class="carousel slide carousel-fade"
+             data-bs-ride="carousel"
+             data-bs-interval="5000">
+
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide-to="0" class="active"
+                        aria-current="true" aria-label="Slide 1"></button>
+                <button type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide-to="1" aria-label="Slide 2"></button>
+                <button type="button" data-bs-target="#heroCarousel"
+                        data-bs-slide-to="2" aria-label="Slide 3"></button>
+            </div>
+
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="carousel-slide">
+                        <div class="rv-hero-content">
+                            <span class="rv-hero-eyebrow">
+                                <i class="bi bi-stars me-2"></i>WELCOME TO ROYALVILLA
+                            </span>
+                            <h1>Find Your Own<br />Piece of Paradise</h1>
+                            <p>
+                                Discover thoughtfully selected villas where
+                                comfort, privacy and unforgettable experiences
+                                come together.
+                            </p>
+                            <a href="#villa-listings" class="btn rv-hero-btn">
+                                Explore Our Villas
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="carousel-slide slide-two">
+                        <div class="rv-hero-content">
+                            <span class="rv-hero-eyebrow">
+                                <i class="bi bi-gem me-2"></i>COMFORT MEETS ELEGANCE
+                            </span>
+                            <h1>A Stay Worth<br />Remembering</h1>
+                            <p>
+                                Enjoy the space, amenities and comfort you need
+                                to make every getaway feel special.
+                            </p>
+                            <a href="#villa-listings" class="btn rv-hero-btn">
+                                Discover the Collection
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="carousel-item">
+                    <div class="carousel-slide slide-three">
+                        <div class="rv-hero-content">
+                            <span class="rv-hero-eyebrow">
+                                <i class="bi bi-calendar-heart me-2"></i>YOUR NEXT GETAWAY
+                            </span>
+                            <h1>Make Room for<br />Beautiful Memories</h1>
+                            <p>
+                                Explore our available properties and find
+                                the right villa for your next escape.
+                            </p>
+                            <a href="#villa-listings" class="btn rv-hero-btn">
+                                Find Your Villa
+                                <i class="bi bi-arrow-right ms-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="carousel-control-prev" type="button"
+                    data-bs-target="#heroCarousel" data-bs-slide="prev"
+                    aria-label="Previous slide">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+
+            <button class="carousel-control-next" type="button"
+                    data-bs-target="#heroCarousel" data-bs-slide="next"
+                    aria-label="Next slide">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+    </section>
+
+    <!-- Highlights -->
+    <div class="container">
+        <div class="rv-intro-strip">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="rv-intro-item">
+                        <div class="rv-intro-icon">
+                            <i class="bi bi-house-heart"></i>
+                        </div>
+                        <div>
+                            <strong>Handpicked Villas</strong>
+                            <small>Spaces for your perfect stay</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="rv-intro-item">
+                        <div class="rv-intro-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div>
+                            <strong>Room for Everyone</strong>
+                            <small>Find a villa that fits your group</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="rv-intro-item">
+                        <div class="rv-intro-icon">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div>
+                            <strong>Plan Your Stay</strong>
+                            <small>Explore properties and amenities</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Villa listings -->
+    <section class="container rv-listings" id="villa-listings">
+
+        <div class="text-center mb-5">
+            <div class="rv-eyebrow mb-3">YOUR NEXT ESCAPE STARTS HERE</div>
+            <h2 class="rv-section-title mb-3">Explore Our Villas</h2>
+            <p class="rv-section-subtitle">
+                Discover spaces designed for relaxation, comfort and
+                meaningful moments with the people who matter.
+            </p>
+            <div class="mt-4">
+                <span class="rv-listing-count">
+                    <i class="bi bi-house-door me-1"></i>
+                    @villas.Count @(villas.Count == 1 ? "property" : "properties")
+                </span>
+            </div>
+        </div>
+
+        @if (TempData["error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show rv-alert mb-4"
+                 role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                @TempData["error"]
+                <button type="button" class="btn-close"
+                        data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        @if (!villas.Any())
+        {
+            <div class="rv-empty-state">
+                <div class="rv-empty-icon">
+                    <i class="bi bi-house"></i>
+                </div>
+                <h3 class="fw-bold mb-2">No Villas Available Yet</h3>
+                <p class="text-muted mb-0">
+                    Our collection is being updated. Please check back later.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+
+                @foreach (var villa in villas)
+                {
+                    <div class="col">
+                        <article class="rv-villa-card">
+
+                            <div class="rv-villa-image-wrap">
+                                @if (!string.IsNullOrWhiteSpace(villa.ImageUrl))
+                                {
+                                    <img src="@SD.getImageURL(villa.ImageUrl)"
+                                         class="rv-villa-image"
+                                         alt="@villa.Name"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="rv-image-placeholder">
+                                        <i class="bi bi-house-heart"></i>
+                                    </div>
+                                }
+
+                                <div class="rv-price-badge">
+                                    ₹@villa.Rate.ToString("N0")
+                                    <span class="fw-normal">/ night</span>
+                                </div>
+                            </div>
+
+                            <div class="rv-villa-card-body">
+                                <h3 class="rv-villa-name">@villa.Name</h3>
+
+                                <p class="rv-villa-description">
+                                    @(string.IsNullOrWhiteSpace(villa.Details)
+                                        ? "Discover this property and explore its features and amenities."
+                                        : villa.Details)
+                                </p>
+
+                                <div class="rv-villa-features">
+                                    <span>
+                                        <i class="bi bi-people-fill"></i>
+                                        @villa.Occupancy guests
+                                    </span>
+                                    <span>
+                                        <i class="bi bi-rulers"></i>
+                                        @villa.Sqft.ToString("N0") sq.ft.
+                                    </span>
+                                </div>
+
+                                <div class="d-grid gap-2 mt-2">
+                                    <a asp-controller="VillaAmenities"
+                                       asp-action="Details"
+                                       asp-route-id="@villa.Id"
+                                       class="btn rv-details-btn">
+                                        <i class="bi bi-arrow-up-right-square me-2"></i>
+                                        View Villa Details
+                                    </a>
+
+                                    <a href="mailto:vignesh@gmail.com"
+                                       class="btn rv-contact-btn">
+                                        <i class="bi bi-envelope me-2"></i>
+                                        Contact Us
+                                    </a>
+                                </div>
+                            </div>
+
+                        </article>
+                    </div>
+                }
+            </div>
+
+            <!-- Statistics -->
+            <section class="rv-stats mt-5">
+                <div class="text-center mb-4">
+                    <div class="rv-eyebrow mb-2">THE COLLECTION</div>
+                    <h3 class="rv-section-title fs-3 mb-0">RoyalVilla at a Glance</h3>
+                </div>
+
+                <div class="row g-3 text-center">
+                    <div class="col-6 col-lg-3">
+                        <div class="rv-stat-item">
+                            <div class="rv-stat-icon">
+                                <i class="bi bi-houses"></i>
+                            </div>
+                            <div class="rv-stat-value">@villas.Count</div>
+                            <p class="rv-stat-label">Total Villas</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-lg-3">
+                        <div class="rv-stat-item">
+                            <div class="rv-stat-icon">
+                                <i class="bi bi-currency-rupee"></i>
+                            </div>
+                            <div class="rv-stat-value">
+                                ₹@villas.Min(v => v.Rate).ToString("N0")
+                            </div>
+                            <p class="rv-stat-label">Starting Price / Night</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-lg-3">
+                        <div class="rv-stat-item">
+                            <div class="rv-stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div class="rv-stat-value">
+                                @villas.Max(v => v.Occupancy)
+                            </div>
+                            <p class="rv-stat-label">Largest Guest Capacity</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-lg-3">
+                        <div class="rv-stat-item">
+                            <div class="rv-stat-icon">
+                                <i class="bi bi-bounding-box"></i>
+                            </div>
+                            <div class="rv-stat-value">
+                                @villas.Sum(v => v.Sqft).ToString("N0")
+                            </div>
+                            <p class="rv-stat-label">Combined Sq. Ft.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        }
+
+        <div class="text-center mt-5 rv-bottom-note">
+            <i class="bi bi-leaf me-1"></i>
+            Find your comfort. Create your memories. Stay with RoyalVilla.
+        </div>
+    </section>
+</div>

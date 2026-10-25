@@ -1,77 +1,361 @@
-﻿@model RoyalVilla.DTO.VillaDTO
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
+﻿
+@model RoyalVilla.DTO.VillaDTO
+@using RoyalVillaWeb
 
-            <!-- Form Card -->
-            <div class="card">
-                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold h4 pt-1">Delete Villa</span>
-                </div>
-                <div class="card-body">
-                    <form method="post">
-                        <input type="hidden" asp-for="Id" />
-                        <!-- Villa Name -->
-                        <div class="mb-3">
-                            <label asp-for="Name" class="form-label">
-                                Villa Name <span class="text-danger">*</span>
-                            </label>
-                            <input asp-for="Name" disabled class="form-control" placeholder="Enter villa name" />
+@{
+    ViewData["Title"] = "Delete Villa";
+}
+
+<style>
+    .delete-page {
+        background: #f5f6f2;
+        min-height: 100vh;
+        padding: 42px 0 60px;
+        color: #263b2e;
+    }
+
+    .delete-eyebrow {
+        color: #8a7772;
+        font-size: .72rem;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
+
+    .delete-title {
+        color: #293c30;
+        font-size: clamp(2rem, 4vw, 2.55rem);
+        font-weight: 750;
+        letter-spacing: -1px;
+    }
+
+    .delete-subtitle {
+        color: #818a81;
+    }
+
+    .delete-card {
+        background: #fff;
+        border: 1px solid #e8e5e3;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 12px 35px rgba(55, 43, 40, .055);
+    }
+
+    .delete-card-header {
+        background: #8a3939;
+        color: #fff;
+        padding: 23px 28px;
+    }
+
+    .delete-card-header h2 {
+        font-size: 1.15rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .delete-card-body {
+        padding: clamp(22px, 4vw, 36px);
+    }
+
+    .delete-warning {
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        background: #fff6f3;
+        border: 1px solid #f2ddd7;
+        border-radius: 13px;
+        padding: 17px;
+        margin-bottom: 28px;
+        color: #7d4540;
+    }
+
+    .delete-warning-icon {
+        font-size: 1.4rem;
+        line-height: 1.3;
+    }
+
+    .delete-section-label {
+        color: #788278;
+        font-size: .73rem;
+        font-weight: 750;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        margin-bottom: 18px;
+    }
+
+    .delete-page .form-label {
+        color: #526054;
+        font-size: .85rem;
+        font-weight: 650;
+        margin-bottom: 7px;
+    }
+
+    .delete-page .form-control:disabled {
+        background: #f7f8f5;
+        border-color: #e5e9e2;
+        color: #536054;
+        opacity: 1;
+        border-radius: 10px;
+    }
+
+    .delete-page textarea.form-control {
+        resize: none;
+    }
+
+    .delete-divider {
+        border: 0;
+        border-top: 1px solid #edf0eb;
+        margin: 26px 0;
+    }
+
+    .delete-image-box {
+        background: #f7f8f5;
+        border: 1px solid #e7ebe4;
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .delete-image {
+        width: 100%;
+        max-height: 320px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .delete-image-placeholder {
+        background: #f2f4ef;
+        border-radius: 12px;
+        padding: 35px;
+        color: #8a9389;
+        text-align: center;
+    }
+
+    .btn-cancel-delete {
+        background: #fff;
+        color: #42594a;
+        border: 1px solid #dce3da;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 600;
+    }
+
+    .btn-cancel-delete:hover {
+        background: #f3f6f1;
+        color: #263d2e;
+    }
+
+    .btn-confirm-delete {
+        background: #963e3e;
+        color: #fff;
+        border: 1px solid #963e3e;
+        border-radius: 10px;
+        padding: 12px 20px;
+        font-weight: 650;
+    }
+
+    .btn-confirm-delete:hover {
+        background: #7c3030;
+        border-color: #7c3030;
+        color: #fff;
+    }
+
+    @@media (max-width: 575px) {
+        .delete-page {
+            padding-top: 28px;
+        }
+
+        .delete-card-header,
+        .delete-card-body {
+            padding: 21px;
+        }
+    }
+</style>
+
+<div class="delete-page">
+    <div class="container">
+
+        <div class="mb-4 mb-lg-5">
+            <div class="delete-eyebrow mb-2">
+                ROYALVILLA · PROPERTY MANAGEMENT
+            </div>
+
+            <h1 class="delete-title mb-2">
+                Delete Villa
+            </h1>
+
+            <p class="delete-subtitle mb-0">
+                Review the property details before confirming deletion.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-xl-8">
+
+                <div class="delete-card">
+
+                    <div class="delete-card-header d-flex
+                                align-items-center gap-3">
+                        <i class="bi bi-trash3 fs-4"></i>
+
+                        <div>
+                            <h2>Confirm property deletion</h2>
+                            <small class="text-white-50">
+                                This action may not be reversible.
+                            </small>
                         </div>
-                        <!-- Details -->
-                        <div class="mb-3">
-                            <label asp-for="Details" class="form-label">Description</label>
-                            <textarea asp-for="Details" disabled class="form-control" rows="4"
-                                      placeholder="Describe the villa"></textarea>
-                        </div>
-                        <!-- Rate and Occupancy -->
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Rate" class="form-label">
-                                    Nightly Rate <span class="text-danger">*</span>
-                                </label>
-                                <div class="input-group">
-                                    <span class="input-group-text">$</span>
-                                    <input asp-for="Rate" disabled type="number" step="0.01" class="form-control" placeholder="0.00" />
+                    </div>
+
+                    <div class="delete-card-body">
+
+                        <div class="delete-warning">
+                            <i class="bi bi-exclamation-triangle-fill
+                                      delete-warning-icon"></i>
+
+                            <div>
+                                <strong>Are you sure you want to delete this villa?</strong>
+
+                                <div class="small mt-1">
+                                    Please verify the property below before
+                                    proceeding. Related bookings or records
+                                    may affect whether deletion is permitted.
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label asp-for="Occupancy" class="form-label">Max Occupancy</label>
-                                <input asp-for="Occupancy" disabled type="number" class="form-control" placeholder="Number of guests" />
+                        </div>
+
+                        <form method="post">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="delete-section-label">
+                                01 &nbsp; Property information
                             </div>
-                        </div>
 
-                        <!-- Sqft -->
-                        <div class="mb-3">
-                            <label asp-for="Sqft" class="form-label">Square Feet</label>
-                            <input asp-for="Sqft" disabled type="number" class="form-control" placeholder="Area in sqft" />
-                        </div>
+                            <div class="mb-4">
+                                <label asp-for="Name" class="form-label">
+                                    Villa Name
+                                </label>
 
-                        <!-- Image URL -->
-                        <div class="mb-4">
-                            <label asp-for="ImageUrl" class="form-label">Image URL</label>
-                            <input asp-for="ImageUrl" disabled class="form-control" placeholder="https://example.com/image.jpg" />
-                        </div>
-                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                        {
-                            <div class="text-center mb-4">
-                                <img src="@SD.getImageURL(Model.ImageUrl)" alt="@Model.Name" class="img-fluid rounded" style="max-height: 350px;">
+                                <input asp-for="Name"
+                                       disabled
+                                       class="form-control" />
                             </div>
-                        }
 
-                        <!-- Action Buttons -->
-                        <div class="d-flex gap-2 justify-content-end">
-                            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-danger">
-                                <i class="bi bi-check me-2"></i>Delete Villa
-                            </button>
-                        </div>
+                            <div class="mb-4">
+                                <label asp-for="Details" class="form-label">
+                                    Description
+                                </label>
 
+                                <textarea asp-for="Details"
+                                          disabled
+                                          class="form-control"
+                                          rows="4"></textarea>
+                            </div>
 
-                       
-                    </form>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Rate" class="form-label">
+                                        Nightly Rate
+                                    </label>
 
+                                    <div class="input-group">
+                                        <span class="input-group-text">₹</span>
+
+                                        <input asp-for="Rate"
+                                               disabled
+                                               type="number"
+                                               class="form-control" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Occupancy"
+                                           class="form-label">
+                                        Maximum Occupancy
+                                    </label>
+
+                                    <input asp-for="Occupancy"
+                                           disabled
+                                           type="number"
+                                           class="form-control" />
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Sqft" class="form-label">
+                                        Property Area
+                                    </label>
+
+                                    <div class="input-group">
+                                        <input asp-for="Sqft"
+                                               disabled
+                                               type="number"
+                                               class="form-control" />
+
+                                        <span class="input-group-text">
+                                            sq.ft.
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="delete-divider" />
+
+                            <div class="delete-section-label">
+                                02 &nbsp; Property image
+                            </div>
+
+                            <div class="delete-image-box mb-4">
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img src="@SD.getImageURL(Model.ImageUrl)"
+                                         alt="@Model.Name"
+                                         class="delete-image" />
+                                }
+                                else
+                                {
+                                    <div class="delete-image-placeholder">
+                                        <i class="bi bi-image fs-1"></i>
+                                        <p class="mb-0 mt-2">
+                                            No property image available
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="ImageUrl"
+                                       class="form-label">
+                                    Image URL
+                                </label>
+
+                                <input asp-for="ImageUrl"
+                                       disabled
+                                       class="form-control" />
+                            </div>
+
+                            <hr class="delete-divider" />
+
+                            <div class="d-flex flex-column flex-sm-row
+                                        justify-content-end gap-3">
+
+                                <a asp-action="Index"
+                                   class="btn btn-cancel-delete">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    Cancel
+                                </a>
+
+                                <button type="submit"
+                                        class="btn btn-confirm-delete">
+                                    <i class="bi bi-trash3 me-2"></i>
+                                    Confirm Delete
+                                </button>
+
+                            </div>
+                        </form>
+
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
