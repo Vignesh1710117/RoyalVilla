@@ -1,31 +1,273 @@
+/* =========================================
+   BookMyVilla - Shared Layout
+   ========================================= */
+
+:root {
+    --royal-navy: #14251f;
+    --royal-navy-light: #20372e;
+    --royal-gold: #c6a15b;
+    --royal-gold-light: #e0c486;
+    --royal-background: #faf9f6;
+    --royal-text: #26352e;
+}
+
+/* Base layout */
+
 html {
-  font-size: 14px;
+    min-height: 100%;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+body.royal-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    background: var(--royal-background);
+    color: var(--royal-text);
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Navbar */
+
+.royal-navbar {
+    background: var(--royal-navy);
+    padding: 14px 0;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.royal-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-right: 30px;
+    color: #fff !important;
+    text-decoration: none;
 }
 
-body {
-  margin-bottom: 60px;
+.brand-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    flex-shrink: 0;
+    border: 1px solid var(--royal-gold);
+    border-radius: 50%;
+    color: var(--royal-gold-light);
+    font-size: 23px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.brand-text {
+    display: block;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.brand-name {
+    display: block;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 25px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+}
+
+.brand-tagline {
+    display: block;
+    margin-top: 4px;
+    color: var(--royal-gold-light);
+    font-size: 8px;
+    letter-spacing: 1.7px;
+}
+
+/* Navigation links */
+
+.royal-nav {
+    gap: 12px;
+}
+
+.royal-navbar .nav-link {
+    position: relative;
+    padding: 10px 13px !important;
+    color: #e5e9e5 !important;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+    .royal-navbar .nav-link:hover,
+    .royal-navbar .nav-link:focus {
+        color: var(--royal-gold-light) !important;
+    }
+
+.royal-nav .nav-link::after {
+    position: absolute;
+    right: 13px;
+    bottom: 3px;
+    left: 13px;
+    height: 2px;
+    background: var(--royal-gold);
+    content: "";
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+}
+
+.royal-nav .nav-link:hover::after {
+    transform: scaleX(1);
+}
+
+/* Login link */
+
+.royal-navbar .login-link {
+    padding-right: 16px !important;
+    padding-left: 16px !important;
+}
+
+/* Register button */
+
+.royal-register-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: 1px solid var(--royal-gold);
+    border-radius: 5px;
+    background: var(--royal-gold);
+    color: #17231d;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+    .royal-register-btn:hover {
+        border-color: var(--royal-gold-light);
+        background: var(--royal-gold-light);
+        color: #17231d;
+        transform: translateY(-1px);
+    }
+
+/* Authenticated user */
+
+.account-link {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.account-icon {
+    color: var(--royal-gold-light);
+    font-size: 21px;
+}
+
+/* Account dropdown */
+
+.royal-dropdown {
+    min-width: 190px;
+    margin-top: 12px !important;
+    padding: 8px;
+    border: 1px solid #e9e4d8;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+    .royal-dropdown .dropdown-header {
+        color: #888;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .royal-dropdown .dropdown-item {
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+        .royal-dropdown .dropdown-item:hover {
+            background: #f5f0e5;
+            color: var(--royal-navy);
+        }
+
+/* Main content */
+
+.royal-main {
+    flex: 1;
+    width: 100%;
+    padding-top: 30px;
+    padding-bottom: 45px;
+}
+
+/* Footer */
+
+.royal-footer {
+    padding: 24px 0;
+    border-top: 1px solid #e8e3d8;
+    background: #fff;
+}
+
+.footer-brand {
+    color: var(--royal-navy);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 21px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+    .footer-brand i {
+        color: var(--royal-gold);
+    }
+
+.footer-description {
+    margin-top: 5px;
+    color: #777;
+    font-size: 12px;
+}
+
+.footer-copyright {
+    color: #777;
+    font-size: 12px;
+}
+
+.footer-link {
+    color: var(--royal-navy);
+    font-size: 13px;
+    text-decoration: none;
+}
+
+    .footer-link:hover {
+        color: #a27c37;
+        text-decoration: underline;
+    }
+
+/* Mobile navigation */
+
+.royal-toggler {
+    border-color: rgba(255, 255, 255, 0.35);
+}
+
+    .royal-toggler .navbar-toggler-icon {
+        filter: brightness(0) invert(1);
+    }
+
+@media (max-width: 991.98px) {
+
+    .royal-navbar .navbar-collapse {
+        padding-top: 15px;
+    }
+
+    .royal-nav {
+        gap: 0;
+    }
+
+        .royal-nav .nav-link::after {
+            display: none;
+        }
+
+    .royal-account {
+        align-items: flex-start !important;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .royal-register-btn {
+        display: inline-block;
+    }
 }
