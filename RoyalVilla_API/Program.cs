@@ -144,6 +144,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBookVillaService, BookVillaService>();
+builder.Services.AddScoped<ISummaryHelper, SummaryHelper>();
 
 
 var app = builder.Build();
