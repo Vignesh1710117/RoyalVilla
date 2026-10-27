@@ -1,0 +1,384 @@
+﻿@model RoyalVilla.DTO.SummaryDTO
+@using RoyalVillaWeb
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Booking Summary";
+    var inr = CultureInfo.GetCultureInfo("en-IN");
+}
+
+@section Styles {
+    <link rel="stylesheet"
+          href="~/css/summary.css"
+          asp-append-version="true" />
+}
+
+<div class="rv-summary-page">
+    <div class="container rv-summary-container">
+
+        <!-- Page heading -->
+        <header class="rv-summary-header">
+            <div class="rv-summary-eyebrow">
+                YOUR STAY · ALMOST COMPLETE
+            </div>
+
+            <h1>Your stay, beautifully planned.</h1>
+
+            <p>
+                Review your villa, dates and guest details before proceeding.
+            </p>
+        </header>
+
+        <div class="row g-4 align-items-start">
+
+            <!-- LEFT COLUMN -->
+            <div class="col-lg-8">
+
+                <!-- Villa card -->
+                <section class="rv-summary-villa rv-summary-card">
+
+                    <div class="rv-summary-image-wrap">
+                        @if (!string.IsNullOrWhiteSpace(Model.ImageUrl))
+                        {
+                            <img src="@SD.getImageURL(Model.ImageUrl)"
+                                 alt="@Model.Name"
+                                 class="rv-summary-villa-image" />
+                        }
+                        else
+                        {
+                            <div class="rv-summary-image-placeholder">
+                                <i class="bi bi-house-heart"></i>
+                                <span>Villa image unavailable</span>
+                            </div>
+                        }
+
+                        <span class="rv-summary-image-badge">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Your selected villa
+                        </span>
+                    </div>
+
+                    <div class="rv-summary-villa-content">
+
+                        <div class="rv-summary-eyebrow">
+                            YOUR DESTINATION
+                        </div>
+
+                        <h2>@Model.Name</h2>
+
+                        <p class="rv-summary-description">
+                            @(string.IsNullOrWhiteSpace(Model.Details)
+                                ? "Enjoy a comfortable and memorable stay at your selected villa."
+                                : Model.Details)
+                        </p>
+
+                        <div class="rv-summary-villa-facts">
+
+                            <div class="rv-summary-fact">
+                                <span class="rv-summary-fact-icon">
+                                    <i class="bi bi-rulers"></i>
+                                </span>
+
+                                <div>
+                                    <small>Property area</small>
+                                    <strong>@Model.Sqft.ToString("N0") sq. ft.</strong>
+                                </div>
+                            </div>
+
+                            <div class="rv-summary-fact">
+                                <span class="rv-summary-fact-icon">
+                                    <i class="bi bi-people"></i>
+                                </span>
+
+                                <div>
+                                    <small>Maximum occupancy</small>
+                                    <strong>@Model.Occupancy guests</strong>
+                                </div>
+                            </div>
+
+                            <div class="rv-summary-fact">
+                                <span class="rv-summary-fact-icon">
+                                    <i class="bi bi-house"></i>
+                                </span>
+
+                                <div>
+                                    <small>Villa ID</small>
+                                    <strong>@Model.VillaId</strong>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stay details -->
+                <section class="rv-summary-card rv-summary-section">
+
+                    <div class="rv-summary-section-heading">
+                        <span class="rv-summary-section-icon">
+                            <i class="bi bi-calendar2-check"></i>
+                        </span>
+
+                        <div>
+                            <h2>Your stay</h2>
+                            <p>Your selected dates and duration</p>
+                        </div>
+                    </div>
+
+                    <div class="rv-summary-stay-grid">
+
+                        <div class="rv-summary-date-box">
+                            <span class="rv-summary-label">CHECK-IN</span>
+
+                            <div class="rv-summary-date">
+                                @Model.CheckIn.ToString("dd MMM yyyy")
+                            </div>
+
+                            <small>
+                                @Model.CheckIn.ToString("hh:mm tt")
+                            </small>
+                        </div>
+
+                        <div class="rv-summary-date-box">
+                            <span class="rv-summary-label">CHECK-OUT</span>
+
+                            <div class="rv-summary-date">
+                                @Model.CheckOut.ToString("dd MMM yyyy")
+                            </div>
+
+                            <small>
+                                @Model.CheckOut.ToString("hh:mm tt")
+                            </small>
+                        </div>
+
+                        <div class="rv-summary-duration">
+                            <span class="rv-summary-duration-icon">
+                                <i class="bi bi-moon-stars"></i>
+                            </span>
+
+                            <div>
+                                <span class="rv-summary-label">DURATION</span>
+
+                                <div class="rv-summary-date">
+                                    @Model.NumberOfNights
+                                    @(Model.NumberOfNights == 1 ? "Night" : "Nights")
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- Amenities -->
+                <section class="rv-summary-card rv-summary-section">
+
+                    <div class="rv-summary-section-heading">
+                        <span class="rv-summary-section-icon">
+                            <i class="bi bi-stars"></i>
+                        </span>
+
+                        <div>
+                            <h2>Villa amenities</h2>
+                            <p>Explore what's available at your villa</p>
+                        </div>
+                    </div>
+
+                    @if (Model.AmenitiesName != null && Model.AmenitiesName.Any())
+                    {
+                        <div class="rv-summary-amenities">
+
+                            @foreach (var amenity in Model.AmenitiesName)
+                            {
+                                <div class="rv-summary-amenity">
+
+                                    <span class="rv-summary-amenity-icon">
+                                        <i class="bi bi-check2"></i>
+                                    </span>
+
+                                    <div>
+                                        <h3>@amenity.Name</h3>
+
+                                        @if (!string.IsNullOrWhiteSpace(amenity.Description))
+                                        {
+                                            <p>@amenity.Description</p>
+                                        }
+                                    </div>
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rv-summary-empty">
+                            <i class="bi bi-info-circle"></i>
+                            No amenities are currently listed for this villa.
+                        </div>
+                    }
+
+                </section>
+
+                <!-- Guest details -->
+                <section class="rv-summary-card rv-summary-section">
+
+                    <div class="rv-summary-section-heading">
+                        <span class="rv-summary-section-icon">
+                            <i class="bi bi-people"></i>
+                        </span>
+
+                        <div>
+                            <h2>Guest information</h2>
+                            <p>Review the details of everyone joining your stay</p>
+                        </div>
+
+                        @if (Model.Guests != null && Model.Guests.Any())
+                        {
+                            <span class="rv-summary-guest-count">
+                                @Model.Guests.Count
+                                @(Model.Guests.Count == 1 ? "Guest" : "Guests")
+                            </span>
+                        }
+                    </div>
+
+                    @if (Model.Guests != null && Model.Guests.Any())
+                    {
+                        <div class="rv-summary-guest-list">
+
+                            @{
+                                int guestNumber = 1;
+                            }
+
+                            @foreach (var guest in Model.Guests)
+                            {
+                                <div class="rv-summary-guest">
+
+                                    <div class="rv-summary-guest-number">
+                                        @guestNumber
+                                    </div>
+
+                                    <div class="rv-summary-guest-details">
+                                        <span class="rv-summary-label">
+                                            GUEST @guestNumber
+                                        </span>
+
+                                        <h3>
+                                            @guest.firstName @guest.lastName
+                                        </h3>
+
+                                        <p>
+                                            <i class="bi bi-person"></i>
+                                            Age: @guest.age
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                                guestNumber++;
+                            }
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="rv-summary-empty">
+                            <i class="bi bi-info-circle"></i>
+                            No guest details are available.
+                        </div>
+                    }
+
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN: PRICE SUMMARY -->
+            <div class="col-lg-4">
+
+                <aside class="rv-summary-price-card">
+
+                    <div class="rv-summary-price-header">
+                        <span class="rv-summary-price-icon">
+                            <i class="bi bi-receipt"></i>
+                        </span>
+
+                        <div>
+                            <h2>Price breakdown</h2>
+                            <p>Your stay at a glance</p>
+                        </div>
+                    </div>
+
+                    <div class="rv-summary-price-main">
+                        <span>Price per night</span>
+
+                        <strong>
+                            ₹@Model.PricePerNight.ToString("N2", inr)
+                        </strong>
+                    </div>
+
+                    <div class="rv-summary-price-row">
+                        <span>Number of nights</span>
+                        <strong>@Model.NumberOfNights</strong>
+                    </div>
+
+                    <div class="rv-summary-price-calculation">
+                        <span>
+                            ₹@Model.PricePerNight.ToString("N2", inr)
+                            × @Model.NumberOfNights
+                            @(Model.NumberOfNights == 1 ? "night" : "nights")
+                        </span>
+                    </div>
+
+                    <div class="rv-summary-total">
+                        <div>
+                            <span>Total amount</span>
+                            <small>For your selected stay</small>
+                        </div>
+
+                        <strong>
+                            ₹@Model.TotalAmount.ToString("N2", inr)
+                        </strong>
+                    </div>
+
+                    <div class="rv-summary-booking-reference">
+                        <span class="rv-summary-label">
+                            BOOKING REFERENCE
+                        </span>
+
+                        <div class="rv-summary-reference-value">
+                            @Model.BookVillaId
+                        </div>
+                    </div>
+
+                    <div class="rv-summary-pay-action">
+                        <a asp-controller="Payment"
+                           asp-action="Index"
+                           asp-route-bookVillaId="@Model.BookVillaId"
+                           class="rv-summary-pay-button">
+                            <i class="bi bi-lock-fill"></i>
+                            Proceed to Pay
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="rv-summary-note">
+                        <i class="bi bi-shield-check"></i>
+
+                        <p>
+                            Please verify your booking details before proceeding.
+                        </p>
+                    </div>
+
+                    <div class="rv-summary-footer">
+                        <i class="bi bi-heart"></i>
+                        <span>Thank you for choosing RoyalVilla.</span>
+                    </div>
+
+
+                </aside>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,698 @@
+:root {
+    --rv-green: #294b37;
+    --rv-green-dark: #1e3829;
+    --rv-green-light: #e9f0e7;
+    --rv-cream: #f7f7f1;
+    --rv-text: #29392e;
+    --rv-muted: #7c877d;
+    --rv-border: #e7ebe3;
+}
+
+/* Page */
+.rv-summary-page {
+    min-height: 100vh;
+    padding: 48px 0 70px;
+    background: var(--rv-cream);
+    color: var(--rv-text);
+}
+
+.rv-summary-container {
+    max-width: 1180px;
+}
+
+/* Page heading */
+.rv-summary-header {
+    margin-bottom: 32px;
+}
+
+.rv-summary-eyebrow {
+    margin-bottom: 10px;
+    color: #71846e;
+    font-size: .72rem;
+    font-weight: 750;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+}
+
+.rv-summary-header h1 {
+    margin-bottom: 10px;
+    color: var(--rv-green-dark);
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 750;
+    letter-spacing: -1.2px;
+    line-height: 1.2;
+}
+
+.rv-summary-header > p {
+    margin: 0;
+    color: var(--rv-muted);
+    font-size: .98rem;
+    line-height: 1.7;
+}
+
+/* Shared card style */
+.rv-summary-card {
+    margin-bottom: 24px;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid var(--rv-border);
+    border-radius: 18px;
+    box-shadow: 0 8px 28px rgba(33, 55, 38, .045);
+}
+
+/* Villa */
+.rv-summary-image-wrap {
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+    background: #e7ece3;
+}
+
+.rv-summary-villa-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .45s ease;
+}
+
+.rv-summary-villa:hover .rv-summary-villa-image {
+    transform: scale(1.025);
+}
+
+.rv-summary-image-placeholder {
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #718671;
+    background: linear-gradient(135deg, #edf1e7, #dbe5d6);
+}
+
+    .rv-summary-image-placeholder i {
+        font-size: 3rem;
+    }
+
+.rv-summary-image-badge {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 30px;
+    background: rgba(255,255,255,.95);
+    color: var(--rv-green-dark);
+    font-size: .8rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(0,0,0,.08);
+}
+
+    .rv-summary-image-badge i {
+        color: #56845e;
+    }
+
+.rv-summary-villa-content {
+    padding: 27px;
+}
+
+    .rv-summary-villa-content h2 {
+        margin: 0 0 12px;
+        color: var(--rv-green-dark);
+        font-size: 1.75rem;
+        font-weight: 750;
+        letter-spacing: -.5px;
+    }
+
+.rv-summary-description {
+    margin-bottom: 23px;
+    color: var(--rv-muted);
+    font-size: .94rem;
+    line-height: 1.8;
+}
+
+/* Villa facts */
+.rv-summary-villa-facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.rv-summary-fact {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+    padding: 14px 12px;
+    border: 1px solid #edf0eb;
+    border-radius: 12px;
+    background: #fafbf8;
+}
+
+.rv-summary-fact-icon {
+    display: flex;
+    width: 39px;
+    height: 39px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: var(--rv-green-light);
+    color: var(--rv-green);
+    font-size: 1.05rem;
+}
+
+.rv-summary-fact small {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--rv-muted);
+    font-size: .72rem;
+}
+
+.rv-summary-fact strong {
+    display: block;
+    overflow-wrap: anywhere;
+    color: var(--rv-green-dark);
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+/* Sections */
+.rv-summary-section {
+    padding: 25px;
+}
+
+.rv-summary-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 23px;
+}
+
+.rv-summary-section-icon {
+    display: flex;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--rv-green-light);
+    color: var(--rv-green);
+    font-size: 1.2rem;
+}
+
+.rv-summary-section-heading h2 {
+    margin: 0 0 5px;
+    color: var(--rv-green-dark);
+    font-size: 1.2rem;
+    font-weight: 750;
+}
+
+.rv-summary-section-heading p {
+    margin: 0;
+    color: var(--rv-muted);
+    font-size: .83rem;
+    line-height: 1.5;
+}
+
+/* Stay details */
+.rv-summary-stay-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.rv-summary-date-box,
+.rv-summary-duration {
+    min-width: 0;
+    padding: 17px 15px;
+    border: 1px solid var(--rv-border);
+    border-radius: 12px;
+    background: #fafbf8;
+}
+
+.rv-summary-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #819083;
+    font-size: .68rem;
+    font-weight: 750;
+    letter-spacing: 1.2px;
+}
+
+.rv-summary-date {
+    color: var(--rv-green-dark);
+    font-size: 1rem;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+.rv-summary-date-box > small {
+    display: block;
+    margin-top: 5px;
+    color: var(--rv-muted);
+    font-size: .78rem;
+}
+
+.rv-summary-duration {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rv-summary-duration-icon {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--rv-green-light);
+    color: var(--rv-green);
+    font-size: 1.1rem;
+}
+
+.rv-summary-duration .rv-summary-label {
+    margin-bottom: 5px;
+}
+
+/* Amenities */
+.rv-summary-amenities {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+}
+
+.rv-summary-amenity {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid var(--rv-border);
+    border-radius: 12px;
+    background: #fff;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+    .rv-summary-amenity:hover {
+        border-color: #cad8c8;
+        background: #fcfdfb;
+    }
+
+.rv-summary-amenity-icon {
+    display: flex;
+    width: 33px;
+    height: 33px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: var(--rv-green-light);
+    color: var(--rv-green);
+}
+
+.rv-summary-amenity h3 {
+    margin: 2px 0 5px;
+    color: var(--rv-green-dark);
+    font-size: .92rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.rv-summary-amenity p {
+    margin: 0;
+    color: var(--rv-muted);
+    font-size: .8rem;
+    line-height: 1.6;
+}
+
+/* Guest list */
+.rv-summary-guest-count {
+    margin-left: auto;
+    padding: 7px 11px;
+    border-radius: 30px;
+    background: var(--rv-green-light);
+    color: var(--rv-green-dark);
+    font-size: .76rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.rv-summary-guest-list {
+    display: grid;
+    gap: 12px;
+}
+
+.rv-summary-guest {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 17px;
+    border: 1px solid var(--rv-border);
+    border-radius: 13px;
+    background: #fff;
+}
+
+.rv-summary-guest-number {
+    display: flex;
+    width: 43px;
+    height: 43px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 13px;
+    background: var(--rv-green-light);
+    color: var(--rv-green-dark);
+    font-weight: 750;
+}
+
+.rv-summary-guest-details {
+    min-width: 0;
+}
+
+    .rv-summary-guest-details .rv-summary-label {
+        margin-bottom: 4px;
+    }
+
+    .rv-summary-guest-details h3 {
+        margin: 0 0 5px;
+        color: var(--rv-green-dark);
+        font-size: .97rem;
+        font-weight: 750;
+        overflow-wrap: anywhere;
+    }
+
+    .rv-summary-guest-details p {
+        margin: 0;
+        color: var(--rv-muted);
+        font-size: .82rem;
+    }
+
+        .rv-summary-guest-details p i {
+            margin-right: 5px;
+        }
+
+.rv-summary-empty {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px;
+    border-radius: 12px;
+    background: #f5f7f2;
+    color: #6d7c6e;
+    font-size: .88rem;
+    line-height: 1.6;
+}
+
+/* Price card */
+.rv-summary-price-card {
+    position: sticky;
+    top: 24px;
+    overflow: hidden;
+    padding: 26px;
+    border: 1px solid var(--rv-border);
+    border-radius: 18px;
+    background: #fff;
+    box-shadow: 0 10px 32px rgba(33, 55, 38, .07);
+}
+
+.rv-summary-price-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    margin-bottom: 26px;
+}
+
+.rv-summary-price-icon {
+    display: flex;
+    width: 47px;
+    height: 47px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: var(--rv-green-light);
+    color: var(--rv-green);
+    font-size: 1.25rem;
+}
+
+.rv-summary-price-header h2 {
+    margin: 0 0 5px;
+    color: var(--rv-green-dark);
+    font-size: 1.2rem;
+    font-weight: 750;
+}
+
+.rv-summary-price-header p {
+    margin: 0;
+    color: var(--rv-muted);
+    font-size: .81rem;
+}
+
+.rv-summary-price-main,
+.rv-summary-price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+    color: #677368;
+    font-size: .88rem;
+}
+
+.rv-summary-price-main {
+    border-top: 1px solid #edf0eb;
+}
+
+    .rv-summary-price-main strong,
+    .rv-summary-price-row strong {
+        color: var(--rv-green-dark);
+        font-size: .9rem;
+        font-weight: 750;
+        text-align: right;
+    }
+
+.rv-summary-price-calculation {
+    padding: 12px 0 18px;
+    border-bottom: 1px solid #edf0eb;
+    color: #879087;
+    font-size: .79rem;
+}
+
+.rv-summary-total {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 22px 0;
+}
+
+    .rv-summary-total > div > span {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--rv-green-dark);
+        font-size: 1rem;
+        font-weight: 750;
+    }
+
+    .rv-summary-total small {
+        color: var(--rv-muted);
+        font-size: .76rem;
+    }
+
+    .rv-summary-total > strong {
+        color: var(--rv-green);
+        font-size: 1.55rem;
+        font-weight: 800;
+        text-align: right;
+        overflow-wrap: anywhere;
+    }
+
+.rv-summary-booking-reference {
+    padding: 17px;
+    border: 1px solid #e8e9d9;
+    border-radius: 12px;
+    background: var(--rv-cream);
+}
+
+.rv-summary-reference-value {
+    color: var(--rv-green-dark);
+    font-size: .82rem;
+    font-weight: 700;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.rv-summary-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    margin-top: 17px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #f0f5ed;
+    color: #536b57;
+}
+
+    .rv-summary-note > i {
+        margin-top: 2px;
+        color: var(--rv-green);
+        font-size: 1.1rem;
+    }
+
+    .rv-summary-note p {
+        margin: 0;
+        font-size: .8rem;
+        line-height: 1.7;
+    }
+
+.rv-summary-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 22px;
+    color: #849083;
+    font-size: .76rem;
+    text-align: center;
+}
+
+    .rv-summary-footer i {
+        color: #65816a;
+    }
+
+/* Responsive layout */
+@media (max-width: 991.98px) {
+    .rv-summary-price-card {
+        position: static;
+    }
+
+    .rv-summary-image-wrap {
+        height: 280px;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .rv-summary-page {
+        padding: 30px 0 45px;
+    }
+
+    .rv-summary-header {
+        margin-bottom: 25px;
+    }
+
+    .rv-summary-villa-content,
+    .rv-summary-section,
+    .rv-summary-price-card {
+        padding: 20px;
+    }
+
+    .rv-summary-villa-facts {
+        grid-template-columns: 1fr;
+    }
+
+    .rv-summary-stay-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rv-summary-amenities {
+        grid-template-columns: 1fr;
+    }
+
+    .rv-summary-image-wrap {
+        height: 240px;
+    }
+
+    .rv-summary-total > strong {
+        font-size: 1.3rem;
+    }
+    .rv-summary-pay-action {
+        margin-top: 22px;
+    }
+
+    .rv-summary-pay-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+        padding: 15px 20px;
+        border-radius: 10px;
+        background: #294b37;
+        color: #fff;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background .2s ease;
+    }
+
+        .rv-summary-pay-button:hover {
+            background: #1e3829;
+            color: #fff;
+        }
+
+        .rv-summary-pay-button .bi-arrow-right {
+            margin-left: auto;
+        }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rv-summary-villa-image,
+    .rv-summary-amenity {
+        transition: none;
+    }
+}
+
+/* Proceed to Pay button */
+.rv-summary-pay-action {
+    display: block;
+    width: 100%;
+    margin-top: 22px;
+}
+
+.rv-summary-pay-button,
+.rv-summary-pay-button:link,
+.rv-summary-pay-button:visited {
+    display: flex !important;
+    width: 100%;
+    min-height: 52px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 15px 18px;
+    box-sizing: border-box;
+    border: 1px solid #294b37;
+    border-radius: 10px;
+    background-color: #294b37;
+    color: #ffffff !important;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-align: center;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+    .rv-summary-pay-button:hover {
+        background-color: #1e3829;
+        border-color: #1e3829;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        transform: translateY(-1px);
+    }
+
+    .rv-summary-pay-button .bi-arrow-right {
+        margin-left: auto;
+    }
+
+    .rv-summary-pay-button .bi-lock-fill {
+        margin-right: 2px;
+    }

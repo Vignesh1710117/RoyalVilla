@@ -39,7 +39,7 @@ namespace RoyalVillaWeb.Controllers
             {
                 return RedirectToAction(
                     "Index",
-                    "BookingSummary",
+                    "Summary",
             new { bookVillaId });
             }
 
