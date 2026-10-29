@@ -145,9 +145,11 @@ builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IBookVillaService, BookVillaService>();
 builder.Services.AddScoped<ISummaryHelper, SummaryHelper>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IVerificationService, VerificationService>();
 
 
-var app = builder.Build();
+var app = builder.Build();  
 await SeedDataAsync(app);
 
 // Configure the HTTP request pipeline.
