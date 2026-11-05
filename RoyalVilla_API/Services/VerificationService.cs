@@ -14,10 +14,13 @@ namespace RoyalVilla_API.Services
     {
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _db;
-        public VerificationService(ApplicationDbContext db, IConfiguration configuration)
+        private readonly ILogger<VerificationService> _logger;
+
+        public VerificationService(ApplicationDbContext db, IConfiguration configuration, ILogger<VerificationService> logger)
         {
             _configuration = configuration;
             _db = db;
+            _logger = logger;   
         }
 
         private string GenerateSignature(string orderId, string paymentId, string secret)
@@ -47,9 +50,17 @@ namespace RoyalVilla_API.Services
 
         public bool Verification(PaymentVerificationRequestDTO request)
         {
+            
+           
             string secret = _configuration["Razorpay:KeySecret"]
                 ?? throw new InvalidOperationException("Razorpay secret is not configured.");
+            
+            if(secret == null)
+            {
+                _logger.LogError("Razorpay secret is not configured.");
+            }
 
+            _logger.LogInformation("Starting payment verification process.");
             string generatedSignature = GenerateSignature(request.RazorpayOrderId, request.RazorpayPaymentId, secret);
 
             byte[] generateSignatureByte;
@@ -65,6 +76,7 @@ namespace RoyalVilla_API.Services
                 return false;
             }
 
+            _logger.LogInformation("Payment verification process completed.");
             return generateSignatureByte.Length == razorpaySignatureByte.Length
                 &&
                 CryptographicOperations.FixedTimeEquals(generateSignatureByte, razorpaySignatureByte);
@@ -76,6 +88,7 @@ namespace RoyalVilla_API.Services
 
             if (paymentDBData == null)
             {
+                _logger.LogError($"Payment record not found for RazorpayOrderId '{request.RazorpayOrderId}'.");
                 throw new InvalidOperationException("Payment record not found.");
             }
 
@@ -84,11 +97,13 @@ namespace RoyalVilla_API.Services
 
             if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(secret))
             {
+                _logger.LogError("Razorpay credentials are not configured.");
                 throw new InvalidOperationException("Razorpay credentials are not configured.");
             }
 
             if (string.IsNullOrWhiteSpace(request.RazorpayPaymentId))
             {
+                _logger.LogError("Payment ID is required for verification.");
                 throw new InvalidOperationException("Payment ID is required.");
             }
 
@@ -98,6 +113,7 @@ namespace RoyalVilla_API.Services
 
             if (payment == null)
             {
+                _logger.LogError("Unable to retrieve payment details from Razorpay.");
                 throw new InvalidOperationException("Unable to retrieve payment details from Razorpay.");
             }
 
@@ -106,6 +122,7 @@ namespace RoyalVilla_API.Services
 
             if (razorpayOrderId != request.RazorpayOrderId)
             {
+                _logger.LogError("Payment does not belong to this order.");
                 throw new InvalidOperationException("Payment does not belong to this order.");
             }
 
@@ -115,20 +132,23 @@ namespace RoyalVilla_API.Services
 
             if (razorpayAmount != expectedAmountInPaise)
             {
-                throw new InvalidOperationException("Payment amount does not match.");
+                _logger.LogError($"Payment amount mismatch: expected {expectedAmountInPaise} paise, got {razorpayAmount} paise.");
+                throw new InvalidOperationException($"Payment amount mismatch: expected {expectedAmountInPaise} paise, got {razorpayAmount} paise.");
             }
 
             string currency = payment["currency"].ToString()!;
 
             if (currency != paymentDBData.Currency)
             {
-                throw new InvalidOperationException("Payment currency does not match.");
+                _logger.LogError($"Payment currency mismatch: expected {paymentDBData.Currency}, got {currency}.");
+                throw new InvalidOperationException($"Payment currency mismatch: expected {paymentDBData.Currency}, got {currency}.");
             }
 
             string status = payment["status"].ToString()!;
 
             if (status != "captured")
             {
+                _logger.LogError($"Payment has not been captured. Current status: {status}.");
                 throw new InvalidOperationException("Payment has not been captured.");
             }
 
@@ -137,7 +157,7 @@ namespace RoyalVilla_API.Services
             paymentDBData.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
-
+            _logger.LogInformation($"Payment record updated successfully for RazorpayOrderId '{request.RazorpayOrderId}' with Payment ID '{request.RazorpayPaymentId}'.");
             return true;
         }
 

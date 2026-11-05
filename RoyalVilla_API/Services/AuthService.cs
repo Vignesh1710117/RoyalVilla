@@ -23,7 +23,9 @@ namespace RoyalVilla_API.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly IMapper _mapper;
-        public AuthService(ApplicationDbContext db, IMapper mapper, IConfiguration configuration, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> usermanager, ITokenService tokenService)
+
+        private readonly ILogger<AuthService> _logger;
+        public AuthService(ILogger<AuthService> logger,ApplicationDbContext db, IMapper mapper, IConfiguration configuration, RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> usermanager, ITokenService tokenService)
         {
             _db = db;
             _mapper = mapper;
@@ -31,6 +33,8 @@ namespace RoyalVilla_API.Services
             _roleManager = roleManager;
             _userManager = usermanager;
             _tokenService = tokenService;
+            _logger = logger;
+
         }
         public async Task<bool> IsEmailExist(string email)
         {
@@ -43,9 +47,9 @@ namespace RoyalVilla_API.Services
         {
             try
             {
-
                 if (await IsEmailExist(registerationRequestDTO.Email))
                 {
+                    _logger.LogError($"User with email '{registerationRequestDTO.Email}' already exists");
                     throw new InvalidOperationException($"User with email '{registerationRequestDTO.Email}' already exists");
                 }
                 
@@ -63,6 +67,9 @@ namespace RoyalVilla_API.Services
                 if(!result.Succeeded)
                 {
                     var error = string.Join(", ", result.Errors.Select(e=>e.Description));
+
+                    _logger.LogError("User registration failed: {Error}", error);
+
                     throw new InvalidOperationException($"User registeration failed {error} ");
                 }
 
@@ -89,6 +96,8 @@ namespace RoyalVilla_API.Services
 
             }
             catch (Exception ex) {
+
+                _logger.LogError($"An unexpected error occurred during user registration{ex.Message}");
                 throw new InvalidOperationException($"An unexpected error occurred during user registration{ex.Message}");
             }
         
@@ -139,6 +148,7 @@ namespace RoyalVilla_API.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError("An unexpected error occurred during Login", ex);
                 throw new InvalidOperationException("An unexpected error occurred during Login", ex);
             }
 
@@ -204,6 +214,7 @@ namespace RoyalVilla_API.Services
             }
             catch (Exception ex)
             {
+                _logger.LogError("An unexpected error occurred during token refresh", ex);
                 throw new InvalidOperationException("An unexpected error occurred during token refresh", ex);
             }
 

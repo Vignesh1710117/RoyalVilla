@@ -25,11 +25,13 @@ namespace RoyalVilla_API.Controllers.v2
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
         private readonly IImageService _imageService;
-        public VillaController(ApplicationDbContext dbContext, IMapper mapper, IImageService imageService)
+        private readonly ILogger<VillaController> _logger;
+        public VillaController(ApplicationDbContext dbContext, IMapper mapper, IImageService imageService, ILogger<VillaController> logger)
         {
             _db = dbContext;
             _mapper = mapper;
             _imageService = imageService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -145,6 +147,7 @@ namespace RoyalVilla_API.Controllers.v2
 
 
             var response = ApiResponse<IEnumerable<VillaDTO>>.Ok(dtoResponseVilla, messageBuilder.ToString());
+            _logger.LogInformation("Villa details retrieved successfully.");
             return Ok(response);
         }
 
@@ -178,12 +181,15 @@ namespace RoyalVilla_API.Controllers.v2
                     return NotFound(ApiResponse<object>.NotFound($"Villa with ID {id} is not found"));
                 }
                 var response = ApiResponse<VillaDTO>.Ok(_mapper.Map<VillaDTO>(Villa), "Retrived successfully");
-
+                
+                _logger.LogInformation("Villa details retrieved successfully for ID '{Id}'.", id);
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                
                 var errorResponse = ApiResponse<object>.Error(500, $"An error occured while retriving the id {id}", ex.Message);
+                _logger.LogError($"An error occured while retriving the id {id}: {ex.Message}");
                 return StatusCode(500, errorResponse);
             }
         }
@@ -206,6 +212,7 @@ namespace RoyalVilla_API.Controllers.v2
             {
                 if (villaDTO == null)
                 {
+                    _logger.LogError("Villa data is required for creation.");
                     return BadRequest(ApiResponse<object>.BadRequest("Villa data is required"));
                 }
 
@@ -213,6 +220,7 @@ namespace RoyalVilla_API.Controllers.v2
 
                 if (duplicateVilla != null)
                 {
+                    _logger.LogError($"Villa with name '{villaDTO.Name}' already exists.");
                     return Conflict(ApiResponse<object>.Conflict($"Villa with name {villaDTO.Name} is already exist"));
                     //return Conflict($"Villa with name {villaDTO.Name} is already exist");
                 }
@@ -235,6 +243,7 @@ namespace RoyalVilla_API.Controllers.v2
                 {
                     if (!_imageService.ValidateImage(villaDTO.Image))
                     {
+                        _logger.LogError("Invalid image file format. Allowed formats are .jpg, .jpeg, .png.");
                         return BadRequest(ApiResponse<object>.BadRequest("Invalid image file. Allowed format .jpg, .jpeg, .png"));
                     }
 
@@ -245,11 +254,13 @@ namespace RoyalVilla_API.Controllers.v2
                 await _db.SaveChangesAsync();
 
                 var response = ApiResponse<VillaDTO>.CreatedAt(_mapper.Map<VillaDTO>(villa), "Villa created successfully");
+                _logger.LogInformation("Villa created successfully with ID '{Id}'.", villa.Id);
                 return CreatedAtAction(nameof(getVillaById), new { id = villa.Id }, response);
             }
             catch (Exception ex)
             {
-                var errorResponse = ApiResponse<object>.Error(500, $"An error occured while creating a Villa", ex.Message);
+                _logger.LogError($"An error occurred while creating a Villa: {ex.Message}");
+                var errorResponse = ApiResponse<object>.Error(500, $"An error occurred while creating a Villa", ex.Message);
                 return StatusCode(500, errorResponse);
                 //return StatusCode(StatusCodes.Status500InternalServerError, $"An error occured while creating a Villa : {ex.Message}");
             }
@@ -267,21 +278,25 @@ namespace RoyalVilla_API.Controllers.v2
             {
                 if (villaUpdateDTO == null)
                 {
+                    _logger.LogError("Villa data is required for update.");
                     return BadRequest(ApiResponse<object>.BadRequest("Villa data is required"));
                 }
 
                 if (id != villaUpdateDTO.Id)
                 {
+                    _logger.LogError("Villa Id in the URL does not match the villa ID in request body.");
                     return BadRequest(ApiResponse<object>.BadRequest("Villa Id in the URL does not match the villa ID in request body"));
                 }
                 if (villaUpdateDTO.Image != null && !_imageService.ValidateImage(villaUpdateDTO.Image))
                 {
+                    _logger.LogError("Invalid image file format. Allowed formats are .jpg, .jpeg, .png.");
                     return BadRequest(ApiResponse<object>.BadRequest("Invalid image file. Allowed format .jpg, .jpeg, .png"));
                 }
                 var existingVilla = await _db.Villa.FirstOrDefaultAsync(x => x.Id == id);
 
                 if (existingVilla == null)
                 {
+                    _logger.LogError("Villa with ID {Id} is not found.", id);
                     return NotFound(ApiResponse<object>.NotFound($"Villa with ID {id} is not found"));
                 }
 
@@ -289,6 +304,7 @@ namespace RoyalVilla_API.Controllers.v2
 
                 if (duplicateVilla != null)
                 {
+                    _logger.LogError($"Villa with name '{villaUpdateDTO.Name}' already exists.");
                     return Conflict(ApiResponse<object>.Conflict($"Villa with name {villaUpdateDTO.Name} is already exist"));
                 }
 
@@ -311,11 +327,13 @@ namespace RoyalVilla_API.Controllers.v2
                 await _db.SaveChangesAsync();
 
                 var response = ApiResponse<VillaDTO>.Ok(_mapper.Map<VillaDTO>(existingVilla), "Villa updated successfully");
+                _logger.LogInformation("Villa updated successfully with ID '{Id}'.", existingVilla.Id);
                 return Ok(response);
             }
             catch (Exception ex)
             {
-                var errorResponse = ApiResponse<object>.Error(500, $"An error occured while updating a Villa", ex.Message);
+                _logger.LogError($"An error occurred while updating a Villa: {ex.Message}");
+                var errorResponse = ApiResponse<object>.Error(500, $"An error occurred while updating a Villa", ex.Message);
                 return StatusCode(500, errorResponse);
             }
         }
@@ -333,6 +351,7 @@ namespace RoyalVilla_API.Controllers.v2
 
                 if (existingVilla == null)
                 {
+                    _logger.LogError($"Villa with ID {id} does not exist.");
                     return NotFound(ApiResponse<object>.NotFound($"Villa was not exist"));
                 }
 
@@ -345,12 +364,13 @@ namespace RoyalVilla_API.Controllers.v2
                 _db.Villa.Remove(existingVilla);
 
                 await _db.SaveChangesAsync();
-
+                _logger.LogInformation("Villa deleted successfully with ID '{Id}'.", id);
                 return NoContent();
             }
             catch (Exception ex)
             {
-                var errorResponse = ApiResponse<object>.Error(500, $"An error occured while deleting a Villa", ex.Message);
+                _logger.LogError($"An error occurred while deleting a Villa: {ex.Message}");
+                var errorResponse = ApiResponse<object>.Error(500, $"An error occurred while deleting a Villa", ex.Message);
                 return StatusCode(500, errorResponse);
             }
         }

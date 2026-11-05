@@ -13,12 +13,14 @@ namespace RoyalVilla_API.Controllers
 
     public class PaymentController : ControllerBase
     {
-        public readonly IPaymentService _paymentService;
-        public readonly IVerificationService _verificationService;
-        public PaymentController(IPaymentService paymentService, IVerificationService verificationService)
+        private readonly IPaymentService _paymentService;
+        private readonly IVerificationService _verificationService;
+        private readonly ILogger<PaymentController> _logger;
+        public PaymentController(IPaymentService paymentService, IVerificationService verificationService, ILogger<PaymentController> logger)
         {
             _paymentService = paymentService;
             _verificationService = verificationService;
+            _logger = logger;
         }
 
         [HttpPost("OrderRequest")]
@@ -26,14 +28,16 @@ namespace RoyalVilla_API.Controllers
         {
             if (OrderRequest == null || string.IsNullOrEmpty(OrderRequest.bookVillaId))
             {
-                return BadRequest(ApiResponse<object>.BadRequest("Booking Id not found"));
+                _logger.LogError("BookVillaId is required for payment processing.");
+                return BadRequest(ApiResponse<object>.BadRequest("BookVillaId is required for payment processing."));
             }
 
             var response = await _paymentService.ProcessPayment(OrderRequest);
 
             if (response == null)
             {
-                return NotFound(ApiResponse<object>.NotFound("Book not found"));
+                _logger.LogError($"Payment processing failed for BookVillaId '{OrderRequest.bookVillaId}'.");
+                return NotFound(ApiResponse<object>.NotFound($"Payment processing failed for BookVillaId '{OrderRequest.bookVillaId}'."));
             }
 
             return Ok(ApiResponse<PaymentOrderResponseDTO>.Ok(response, "Payment sent to client"));
@@ -46,6 +50,7 @@ namespace RoyalVilla_API.Controllers
             if (request == null || string.IsNullOrWhiteSpace(request.RazorpayOrderId) ||string.IsNullOrWhiteSpace(request.RazorpayPaymentId) ||
                  string.IsNullOrWhiteSpace(request.RazorpaySignature))
             {
+                _logger.LogError("Payment verification details are required.");
                 return BadRequest(ApiResponse<object>.BadRequest("Payment verification details are required."));
             }
 
@@ -53,11 +58,13 @@ namespace RoyalVilla_API.Controllers
 
             if (!isVerified)
             {
+                _logger.LogError("Invalid payment signature.");
                 return BadRequest(ApiResponse<object>.BadRequest("Invalid payment signature."));
             }
             
             var PaymentDbupdate = await _verificationService.UpdatePaymentDB(request);
 
+            _logger.LogInformation("Payment verified and database updated successfully for RazorpayOrderId '{RazorpayOrderId}'.", request.RazorpayOrderId);
             return Ok(ApiResponse<bool>.Ok(PaymentDbupdate, "Signature verified successfully and payment DB updated"));
         }
     }

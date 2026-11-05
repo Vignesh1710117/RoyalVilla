@@ -17,12 +17,14 @@ namespace RoyalVilla_API.Services
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ILogger<TokenService> _logger;
 
-        public TokenService(IConfiguration configuration, UserManager<ApplicationUser> usermanager, ApplicationDbContext db)
+        public TokenService(IConfiguration configuration, UserManager<ApplicationUser> usermanager, ApplicationDbContext db, ILogger<TokenService> logger)
         {
             _db = db;
             _configuration = configuration;
             _userManager = usermanager;
+            _logger = logger;
         }
 
         public async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
@@ -47,6 +49,8 @@ namespace RoyalVilla_API.Services
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            _logger.LogInformation($"JWT token generated for user '{user.Email}' with expiration at {tokenDescriptor.Expires} UTC.");
             return tokenHandler.WriteToken(token);
         }
 
@@ -62,9 +66,11 @@ namespace RoyalVilla_API.Services
             var exist = await _db.RefreshTokens.AnyAsync(u => u.RefreshTokenValue == refreshToken);
             if (exist)
             {
+                _logger.LogWarning("Generated refresh token already exists. Generating a new one.");
                 return await GenerateRefreshTokenAsync();
             }
 
+            _logger.LogInformation("Refresh token generated successfully.");
             return refreshToken;
         }
 
@@ -74,6 +80,7 @@ namespace RoyalVilla_API.Services
 
             if(storedToken == null)
             {
+                _logger.LogWarning("Refresh token not found.");
                 return false;
             }
 
@@ -93,7 +100,8 @@ namespace RoyalVilla_API.Services
                 RefreshTokenValue = refreshToken,
                 IsValid = true
             };
-
+            
+            _logger.LogInformation($"Saving refresh token for user '{userId}' with expiration at {expiresAt} UTC.");    
             await _db.RefreshTokens.AddAsync(refreshTokenEntity);
             await _db.SaveChangesAsync();
         }
@@ -105,6 +113,7 @@ namespace RoyalVilla_API.Services
             //Token doesn't exit
             if (storedToken == null)
             {
+                _logger.LogWarning("Refresh token not found.");
                 return (false,null, null, false);
             }
 
@@ -126,16 +135,18 @@ namespace RoyalVilla_API.Services
 
                    await _db.SaveChangesAsync();
                 }
-
+                _logger.LogWarning($"Refresh token reuse detected for user '{storedToken.UserId}'. All tokens in the family have been revoked.");
                 return (false, storedToken.UserId, storedToken.JwtTokenId, true);
 
                 
             }
             if(storedToken.ExpiresAt < DateTime.UtcNow)
             {
+                _logger.LogWarning($"Refresh token for user '{storedToken.UserId}' has expired.");
                 return (false, storedToken.UserId, storedToken.JwtTokenId, false);
             }
 
+            _logger.LogInformation($"Refresh token for user '{storedToken.UserId}' is valid.");
             return (true, storedToken.UserId, storedToken.JwtTokenId, false);
         }
     }

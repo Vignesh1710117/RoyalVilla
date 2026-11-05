@@ -10,10 +10,12 @@ namespace RoyalVilla_API.Services
         private readonly string[] AllowedExtension = { ".jpg", ".jpeg", ".png" };
 
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILogger<ImageService> _logger;
 
-        public ImageService(IWebHostEnvironment webHostEnvironment)
+        public ImageService(IWebHostEnvironment webHostEnvironment, ILogger<ImageService> logger)
         {
             _webHostEnvironment = webHostEnvironment;
+            _logger = logger;
         }
         public async Task<bool> DeleteImageAsync(string imageUrl)
         {
@@ -31,13 +33,16 @@ namespace RoyalVilla_API.Services
                 if (File.Exists(filePath))
                 {
                     await Task.Run(() => File.Delete(filePath));
+                    _logger.LogInformation($"Image file '{filePath}' deleted successfully.");
                     return true;
-                }
 
+                }
+                _logger.LogWarning($"Image file '{filePath}' does not exist.");
                 return false;
             }
             catch (Exception ex)
             {
+                _logger.LogError($"An error occurred while deleting an image: {ex.Message}");
                 throw;
             }
         }
@@ -48,6 +53,7 @@ namespace RoyalVilla_API.Services
             {
                 //validate the file
                 if (!ValidateImage(file)) {
+                    _logger.LogError("Invalid image file");
                     throw new InvalidOperationException("Invalid image file");
                 }
 
@@ -57,6 +63,7 @@ namespace RoyalVilla_API.Services
                 //folder not exist create
                 if(!Directory.Exists(uploadFolder))
                 {
+                    _logger.LogInformation($"Upload folder '{uploadFolder}' does not exist. Creating the folder.");
                     Directory.CreateDirectory(uploadFolder);
                 }
 
@@ -73,9 +80,11 @@ namespace RoyalVilla_API.Services
                     await file.CopyToAsync(stream);
                 }
 
+                _logger.LogInformation($"Image file '{filePath}' uploaded successfully.");
                 return $"/images/villas/{uniqueFileName}";
             }
             catch (Exception ex) {
+                _logger.LogError($"An error occurred while uploading an image: {ex.Message}");
                 throw;
             }
         }
@@ -84,6 +93,7 @@ namespace RoyalVilla_API.Services
         {
             if(file==null ||file.Length ==0)
             {
+                _logger.LogWarning("Image file is null or empty.");
                 return false;
             }
 
@@ -95,6 +105,7 @@ namespace RoyalVilla_API.Services
 
             if(!AllowedExtension.Contains(extension))
             {
+                _logger.LogWarning("Image file has an invalid extension.");
                 return false;
             }
             return true;

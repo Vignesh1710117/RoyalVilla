@@ -12,10 +12,11 @@ namespace RoyalVilla_API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        public AuthController(IAuthService authService)
+        private readonly ILogger<AuthController> _logger;
+        public AuthController(IAuthService authService, ILogger<AuthController> logger)
         {
            _authService = authService;
-            
+           _logger = logger;
         }
 
         [HttpPost("register")]
@@ -25,11 +26,12 @@ namespace RoyalVilla_API.Controllers
             {
                 if (registerationRequestDTO == null)
                 {
+                    _logger.LogError("Registeration data is required");
                     return BadRequest(ApiResponse<object>.BadRequest("Registeration data is required"));
                 }
                 if (await _authService.IsEmailExist(registerationRequestDTO.Email))
                 {
-
+                    _logger.LogError($"User with email '{registerationRequestDTO.Email}' already exists");
                     return Conflict(ApiResponse<object>.Conflict($"User with email '{registerationRequestDTO.Email}' already exists"));
                 }
 
@@ -38,15 +40,19 @@ namespace RoyalVilla_API.Controllers
 
                 if (user == null)
                 {
-                    return BadRequest(ApiResponse<object>.BadRequest("Registeration is failed"));
+                    _logger.LogError("Registeration is failed, User doesnt exist");
+                    return BadRequest(ApiResponse<object>.BadRequest("Registeration is failed, User doesnt exist"));
                 }
 
+
+                _logger.LogInformation("User registered successfully", user.Email, user.Role, user);
                 var response = ApiResponse<UserDTO>.CreatedAt(user, "User registered successfully");
 
                 return Ok(response);
             }
             catch(Exception ex) 
             {
+                _logger.LogError("Registeration Failed: " + "Passwords must be at least 6 characters., " + "Passwords must have at least one non alphanumeric character., " + "Passwords must have at least one digit ('0'-'9')., " + "Passwords must have at least one uppercase ('A'-'Z'). ");
                 return BadRequest(ApiResponse<object>.BadRequest("Registeration Failed: " +
                     "Passwords must be at least 6 characters., " +
                     "Passwords must have at least one non alphanumeric character., " +
@@ -60,6 +66,7 @@ namespace RoyalVilla_API.Controllers
         {
             if (loginRequestDTO == null)
             {
+                _logger.LogError("Login data is required");
                 return BadRequest(ApiResponse<object>.BadRequest("Login data is required"));
             }
 
@@ -67,6 +74,7 @@ namespace RoyalVilla_API.Controllers
 
             if (loginResponse == null)
             {
+                _logger.LogError("Login is failed. Please check credendial");
                 return BadRequest(ApiResponse<object>.BadRequest("Login is failed. Please check credendial"));
             }
 
@@ -83,6 +91,7 @@ namespace RoyalVilla_API.Controllers
             {
                 if (refreshTokenRequestDTO == null)
                 {
+                    _logger.LogError("refresh token is required");
                     return BadRequest(ApiResponse<object>.BadRequest("refresh token is required"));
                 }
 
@@ -90,16 +99,19 @@ namespace RoyalVilla_API.Controllers
 
                 if(tokenResponse == null)
                 {
+                    _logger.LogError("Invalid or expired token.", 401);
                     var errorResponse = ApiResponse<object>.Error(401, "Invalid or expired token.");
                     return Unauthorized(errorResponse);
                 }
 
+                _logger.LogInformation("Token refreshed successfully", tokenResponse);
                 var response = ApiResponse<TokenDTO>.Ok(tokenResponse, "Token refreshed successfully");
 
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError($"Error occurred during token creation {ex.Message}");
                 var errorMessage = ApiResponse<object>.Error(500, "Error occurred during token creation", ex.Message);
                 return StatusCode(500, errorMessage); 
             }
