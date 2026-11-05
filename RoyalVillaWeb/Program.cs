@@ -3,8 +3,30 @@ using RoyalVilla.DTO;
 using RoyalVillaWeb;
 using RoyalVillaWeb.Services;
 using RoyalVillaWeb.Services.IService;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Grafana.Loki;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+var lokiUrl = builder.Configuration["Grafana:Loki:Url"];
+var lokiUsername = builder.Configuration["Grafana:Loki:Username"];
+var lokiPassword = builder.Configuration["Grafana:Loki:Token"];
+
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration
+        .MinimumLevel.Information()
+        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.GrafanaLoki(
+            lokiUrl,
+            credentials: new LokiCredentials { Login = lokiUsername, Password = lokiPassword },
+            labels: new[] { new LokiLabel { Key = "app", Value = "RoyalVilla_Web" } });
+});
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

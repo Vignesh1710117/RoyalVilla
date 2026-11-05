@@ -12,10 +12,33 @@ using RoyalVilla_API.Models;
 using RoyalVilla_API.Services;
 using RoyalVilla_API.Services.IServices;
 using Scalar.AspNetCore;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.Grafana.Loki;
+using System.Reflection.Emit;
 using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+var lokiUrl = builder.Configuration["Grafana:Loki:Url"];
+var lokiUsername = builder.Configuration["Grafana:Loki:Username"];
+var lokiPassword = builder.Configuration["Grafana:Loki:Token"];
+
+builder.Host.UseSerilog((context, configuration) =>
+{
+configuration
+    .MinimumLevel.Information()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.GrafanaLoki(
+        lokiUrl,
+        credentials: new LokiCredentials { Login = lokiUsername, Password = lokiPassword },
+        labels: new[] { new LokiLabel { Key = "app", Value = "RoyalVilla_API" } });
+});
+
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JwtSettings")["Secret"]);
 
 
@@ -61,7 +84,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
-
+//builder.Services.AddLogging(options => options.AddConsole());
+//builder.Logging.AddConsole();
 builder.Services.AddControllers();
 
 var Apiprovider = builder.Services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
@@ -149,7 +173,8 @@ builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IVerificationService, VerificationService>();
 
 
-var app = builder.Build();  
+var app = builder.Build();
+
 await SeedDataAsync(app);
 
 // Configure the HTTP request pipeline.

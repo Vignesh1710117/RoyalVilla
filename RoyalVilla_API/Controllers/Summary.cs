@@ -17,11 +17,13 @@ namespace RoyalVilla_API.Controllers
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
         private readonly ISummaryHelper _helper;
-        public Summary(ApplicationDbContext db,IMapper mapper, ISummaryHelper helper)
+        private readonly ILogger<Summary> _logger;
+        public Summary(ApplicationDbContext db,IMapper mapper, ISummaryHelper helper, ILogger<Summary> logger)
         {
             _db = db;
             _mapper = mapper;
             _helper = helper;
+            _logger = logger;
         }
 
         [HttpGet("{bookVillaId}")]
@@ -29,14 +31,16 @@ namespace RoyalVilla_API.Controllers
         {
             if (bookVillaId == null)
             {
-                return BadRequest(ApiResponse<object>.BadRequest("Booking details required"));
+                _logger.LogError("BookVillaId is required to retrieve summary details.");
+                return BadRequest(ApiResponse<object>.BadRequest("BookVillaId is required to retrieve summary details."));
             }
             //var booking = _db.BookVillas.FirstOrDefault(b => b.BookVillaId == bookVillaId);
             var Apiresponse = await _db.BookVillas.Include(u => u.villa).ThenInclude(u => u.Amenities).Include(u => u.Guests).FirstOrDefaultAsync(u => u.BookVillaId == bookVillaId);
 
             if (Apiresponse == null)
             {  
-                return NotFound(ApiResponse<object>.NotFound("Booking details Not found")); 
+                _logger.LogError($"Booking with Id '{bookVillaId}' does not exist.");
+                return NotFound(ApiResponse<object>.NotFound($"Booking with Id '{bookVillaId}' does not exist.")); 
             }
             var totalamount = _helper.CalculateRate((decimal)Apiresponse.villa.Rate, Apiresponse.NumberOfNights);
 
@@ -69,7 +73,7 @@ namespace RoyalVilla_API.Controllers
 
             //var response = _mapper.Map<SummaryDTO>(Apiresponse);
             //response.TotalAmount = Totalamount;
-
+            _logger.LogInformation("Summary details retrieved successfully for BookVillaId '{BookVillaId}'.", bookVillaId);
             return Ok(ApiResponse<SummaryDTO>.Ok(summaryResponse, "Retrived summary details"));
         }
     }

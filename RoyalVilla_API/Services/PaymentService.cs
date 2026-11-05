@@ -14,11 +14,13 @@ namespace RoyalVilla_API.Services
         private readonly ApplicationDbContext _db;
         private readonly ISummaryHelper _summaryHelper;
         private readonly IConfiguration _configuration;
-        public PaymentService(ApplicationDbContext dbContext, ISummaryHelper summaryHelper, IConfiguration configuration)
+        private readonly ILogger<PaymentService> _logger;
+        public PaymentService(ApplicationDbContext dbContext, ISummaryHelper summaryHelper, IConfiguration configuration, ILogger<PaymentService> logger)
         {
             _db = dbContext;
             _summaryHelper = summaryHelper;
             _configuration = configuration;
+            _logger = logger;   
         }
         public async Task<PaymentOrderResponseDTO> ProcessPayment(PaymentOrderRequestDTO paymentOrderRequestDTO)
         {
@@ -26,7 +28,8 @@ namespace RoyalVilla_API.Services
 
             if (Apiresponse == null)
             {
-                throw new InvalidOperationException("Booking not found.");
+                _logger.LogError($"Booking with Id '{paymentOrderRequestDTO.bookVillaId}' does not exist.");
+                throw new InvalidOperationException($"Booking with Id '{paymentOrderRequestDTO.bookVillaId}' does not exist.");
             }
 
             var existingPayment = await _db.Payments.FirstOrDefaultAsync(p => p.bookVillaDId == Apiresponse.Id && p.PaymentStatus == "Pending");
@@ -36,6 +39,7 @@ namespace RoyalVilla_API.Services
 
             if (existingPayment != null)
             {
+                _logger.LogInformation($"Existing payment found for booking '{paymentOrderRequestDTO.bookVillaId}'.");
                 return new PaymentOrderResponseDTO
                 {
                     GatewayOrderId = existingPayment.GatewayOrderId,
@@ -49,14 +53,15 @@ namespace RoyalVilla_API.Services
             var totalamount = _summaryHelper.CalculateRate((decimal)Apiresponse.villa.Rate, Apiresponse.NumberOfNights);
             if (totalamount <= 0)
             {
-                throw new InvalidOperationException("Payment amount must be greater than zero.");
+                _logger.LogWarning($"Payment amount for booking '{paymentOrderRequestDTO.bookVillaId}' must be greater than zero.");
+                throw new InvalidOperationException($"Payment amount for booking '{paymentOrderRequestDTO.bookVillaId}' must be greater than zero.");
             }
             //
 
             if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
             {
-                throw new InvalidOperationException(
-                    "Razorpay credentials are not configured.");
+                _logger.LogError("Razorpay credentials are not configured.");
+                throw new InvalidOperationException("Razorpay credentials are not configured.");
             }
             //
 
@@ -95,6 +100,7 @@ namespace RoyalVilla_API.Services
             await _db.Payments.AddAsync(payment);
             await _db.SaveChangesAsync();
 
+            _logger.LogInformation($"Payment order created successfully for booking '{paymentOrderRequestDTO.bookVillaId}' with Gateway Order ID '{response.GatewayOrderId}'.");
             return response;
         }
 

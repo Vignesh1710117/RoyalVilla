@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RoyalVilla.DTO;
 using RoyalVillaWeb.Models;
+using RoyalVillaWeb.Services;
 using RoyalVillaWeb.Services.IService;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,11 +18,13 @@ namespace RoyalVillaWeb.Controllers
         private readonly IAuthService _authService;
         private readonly ITokenProvider _tokenProvider;
         private readonly IMapper _mapper;
-        public AuthController(IAuthService authService, IMapper mapper, ITokenProvider tokenProvider)
+        private readonly ILogger<AuthService> _logger;
+        public AuthController(IAuthService authService, IMapper mapper, ITokenProvider tokenProvider, ILogger<AuthService> logger)
         {
             _authService = authService;
             _mapper = mapper;
             _tokenProvider = tokenProvider;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -37,6 +40,8 @@ namespace RoyalVillaWeb.Controllers
 
             try
             {
+
+                _logger.LogInformation("RoyalVilla API - Grafana Loki integration test successful from MVC");
                 var response = await _authService.LoginAsync<ApiResponse<TokenDTO>>(login);
                 if (response != null && response.Success && response.Data != null)
                 {
@@ -88,6 +93,7 @@ namespace RoyalVillaWeb.Controllers
 
             try
             {
+ 
                 ApiResponse<UserDTO> response = await _authService.RegisterAsync<ApiResponse<UserDTO>>(registerationRequestDTO);
                 if (response != null && response.Success && response.Data != null)
                 {
