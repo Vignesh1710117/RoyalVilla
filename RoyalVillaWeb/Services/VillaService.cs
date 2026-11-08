@@ -48,7 +48,8 @@ namespace RoyalVillaWeb.Services
                 { "filterBy", parameters.FilterBy },
                 { "filterQuery", parameters.FilterQuery },
                 { "sortBy", parameters.SortBy },
-                { "sortOrder", parameters.SortOrder }
+                { "sortOrder", parameters.SortOrder },
+                { "enablePagination", parameters.EnablePagination.ToString() }
             };
 
             var url = QueryHelpers.AddQueryString(APIEndpoint, queryparam);
@@ -57,7 +58,7 @@ namespace RoyalVillaWeb.Services
             {
                 ApiType = SD.ApiType.GET,
                 Url = url
-            });
+            }) ;
         }
 
         public Task<T?> GetAsync<T>(int id)

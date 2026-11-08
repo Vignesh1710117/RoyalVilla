@@ -40,7 +40,7 @@ namespace RoyalVilla_API.Controllers.v2
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<VillaDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<IEnumerable<VillaDTO>>>> getVilla([FromQuery] string? filterby, [FromQuery] string? filterQuery,
-            [FromQuery] string? sortBy, [FromQuery] string? sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+            [FromQuery] string? sortBy, [FromQuery] string? sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize = 10, [FromQuery] bool? enablePagination = true)
         {
             if (page < 1) page = 1;
             if (pageSize < 1) pageSize = 10;
@@ -114,16 +114,23 @@ namespace RoyalVilla_API.Controllers.v2
             {
                 villaQuery = villaQuery.OrderBy(x => x.Name);
             }
+            var Villa = new List<Villa>();
+            if(enablePagination == true)
+            {
+                var skip = (page - 1) * pageSize;
 
-            var skip = (page - 1) * pageSize;
+                Villa = await villaQuery.Skip(skip).Take(pageSize).ToListAsync();
+            }
+            else
+            {
+                Villa = await villaQuery.ToListAsync();
+            }
 
             var totalCount = await villaQuery.CountAsync();
 
             var totalPages = (int)Math.Ceiling((double)totalCount / pageSize);
 
-            var villa = await villaQuery.Skip(skip).Take(pageSize).ToListAsync();
-
-            var dtoResponseVilla = _mapper.Map<List<VillaDTO>>(villa);
+            var dtoResponseVilla = _mapper.Map<List<VillaDTO>>(Villa);
 
 
             //
@@ -131,7 +138,7 @@ namespace RoyalVilla_API.Controllers.v2
             messageBuilder.Append($"Successfully retrived {dtoResponseVilla.Count} ");
             messageBuilder.Append($"page {page} of {totalPages}, {totalCount} total records");
             _logger.LogInformation($"Villa details retrieved successfully. Page: {page}, PageSize: {pageSize}, TotalCount: {totalCount}, TotalPages: {totalPages}");
-            //
+
 
 
             if (!string.IsNullOrEmpty(filterby) && !string.IsNullOrEmpty(filterQuery))

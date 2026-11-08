@@ -39,6 +39,8 @@ namespace RoyalVillaWeb.Controllers
 
             try
             {
+                parameters.EnablePagination = false; // Ensure pagination is disable for now
+
                 var response = await _villaService.GetAllAsync<ApiResponse<List<VillaDTO>>>(parameters);
                 if (response!=null && response.Success && response.Data !=null)
                 {
