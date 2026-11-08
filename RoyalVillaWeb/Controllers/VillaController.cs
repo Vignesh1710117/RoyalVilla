@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RoyalVilla.DTO;
 using RoyalVillaWeb.Models;
 using RoyalVillaWeb.Services.IService;
+using RoyalVillaWeb.ViewModels;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -32,13 +33,13 @@ namespace RoyalVillaWeb.Controllers
             );
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(VillaQueryParameters parameters)
         {
             List<VillaDTO> villaList = new();
 
             try
             {
-                var response = await _villaService.GetAllAsync<ApiResponse<List<VillaDTO>>>();
+                var response = await _villaService.GetAllAsync<ApiResponse<List<VillaDTO>>>(parameters);
                 if (response!=null && response.Success && response.Data !=null)
                 {
                     villaList = response.Data;

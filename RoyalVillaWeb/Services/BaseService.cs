@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.PathSegments;
 using Microsoft.Extensions.Options;
 using RoyalVilla.DTO;
 using RoyalVillaWeb.Models;
 using RoyalVillaWeb.Services.IService;
+using RoyalVillaWeb.ViewModels;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -28,7 +30,7 @@ namespace RoyalVillaWeb.Services
             PropertyNameCaseInsensitive = true
         };
 
-        public BaseService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor )
+        public BaseService(IHttpClientFactory httpClientFactory, ITokenProvider tokenProvider, IHttpContextAccessor httpContextAccessor)
         {
             this.ResponseModel = new();
             _httpClientFactory = httpClientFactory;
@@ -56,7 +58,7 @@ namespace RoyalVillaWeb.Services
         //
         //
 
-        public async Task<T?> SendAsync<T>(ApiRequest apiRequest, bool withBearer =true)
+        public async Task<T?> SendAsync<T>(ApiRequest apiRequest, bool withBearer = true)
         {
             var vclient = _httpClientFactory.CreateClient("RoyalVillaAPI");
 
@@ -89,9 +91,40 @@ namespace RoyalVillaWeb.Services
             {
                 return default;
             }
+            var PaginationHeaderNames = new[] {
+                                            "X-pagination-CurrentPage",
+                                            "X-pagination-PageSize",
+                                            "X-pagination-totalCount",
+                                            "X-pagination-totalPage"
+                                        };
 
-            return await apiResponse.Content.ReadFromJsonAsync<T>( );
+        var page = new PaginationInfo();
+
+            foreach (var header in PaginationHeaderNames)
+            {
+                if (apiResponse.Headers.TryGetValues(header, out var values) && int.TryParse(values.FirstOrDefault(), out int intValue))
+                {
+                    switch (header)
+                    {
+                        case "X-pagination-CurrentPage": page.CurrentPage = intValue; break;
+                        case "X-pagination-PageSize": page.PageSize = intValue; break;
+                        case "X-pagination-totalCount": page.TotalCount = intValue; break;
+                        case "X-pagination-totalPage": page.TotalPages = intValue; break;
+                    }
+                }
+            }
+
+            //return await apiResponse.Content.ReadFromJsonAsync<T>();
+            var result = await apiResponse.Content.ReadFromJsonAsync<T>();
+
+            if (result is IPagedResponse paged)
+            {
+                paged.Pagination = page;
+            }
+
+            return result;
         }
+
 
         private HttpRequestMessage CreateRequestMessage(ApiRequest apiRequest, bool withBearer)
         {
@@ -144,20 +177,20 @@ namespace RoyalVillaWeb.Services
                         return true;
                     }
                     return false;
-                }   
+                }
 
                 IsRefeshingToken = true;
                 //refreshing here
                 var refreshToken = _tokenProvider.GetRefreshToken();
-                if(string.IsNullOrEmpty(refreshToken))
+                if (string.IsNullOrEmpty(refreshToken))
                 {
                     return false;
                 }
 
                 var client = _httpClientFactory.CreateClient("RoyalVillaAPI");
-                var refreshRequest = new RefreshTokenRequestDTO 
+                var refreshRequest = new RefreshTokenRequestDTO
                 {
-                    RefreshToken = refreshToken 
+                    RefreshToken = refreshToken
                 };
 
                 var apiRequest = new ApiRequest
@@ -175,7 +208,7 @@ namespace RoyalVillaWeb.Services
                 {
                     var result = await apiResponse.Content.ReadFromJsonAsync<ApiResponse<TokenDTO>>();
 
-                    if(result?.Success == true && result.Data!=null && !string.IsNullOrEmpty(result.Data.AccessToken) &&
+                    if (result?.Success == true && result.Data != null && !string.IsNullOrEmpty(result.Data.AccessToken) &&
         !string.IsNullOrEmpty(result.Data.RefreshToken))
                     {
                         //update token
@@ -190,7 +223,7 @@ namespace RoyalVillaWeb.Services
                 return false;
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine($"Token refresh error: {ex.Message}");
                 Console.WriteLine($"Stack Trace: {ex.StackTrace}");

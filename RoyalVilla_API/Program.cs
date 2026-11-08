@@ -88,6 +88,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
 //builder.Logging.AddConsole();
 builder.Services.AddControllers();
 
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+
 var Apiprovider = builder.Services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
 
 foreach (var description in Apiprovider.ApiVersionDescriptions)
@@ -174,7 +179,7 @@ builder.Services.AddScoped<IVerificationService, VerificationService>();
 
 
 var app = builder.Build();
-
+app.UseExceptionHandler();
 await SeedDataAsync(app);
 
 // Configure the HTTP request pipeline.
