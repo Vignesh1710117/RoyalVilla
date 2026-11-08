@@ -1,6 +1,6 @@
 ﻿namespace RoyalVilla.DTO
 {
-    public class ApiResponse<TData>
+    public class ApiResponse<TData> : IPagedResponse
     {
         public bool Success { get; set; }
         public int StatusCode { get; set; }
@@ -8,6 +8,7 @@
         public TData? Data { get; set; }
         public object? Errors { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+        public PaginationInfo? Pagination { get; set; }
 
         public static ApiResponse<TData> Create(bool success, int statusCode, string message, TData? data = default,
             object? errors = null)

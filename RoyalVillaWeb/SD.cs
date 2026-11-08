@@ -11,6 +11,7 @@
 
         }
 
+
         public const string SessionAccessToken = "JwtToken";
         public const string SessionRefreshToken = "RefreshToken";
         public const string CurrentApiVersion = "v2";

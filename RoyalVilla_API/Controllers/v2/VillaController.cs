@@ -40,10 +40,10 @@ namespace RoyalVilla_API.Controllers.v2
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<VillaDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiResponse<IEnumerable<VillaDTO>>>> getVilla([FromQuery] string? filterby, [FromQuery] string? filterQuery,
-            [FromQuery] string? sortBy, [FromQuery] string? sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize=10)
+            [FromQuery] string? sortBy, [FromQuery] string? sortOrder, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            if (page < 1) page=1;
-            //if (pageSize < 10) pageSize = 10;
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 10;
             if (pageSize > 100) pageSize = 100;
 
 
@@ -102,17 +102,17 @@ namespace RoyalVilla_API.Controllers.v2
 
                 villaQuery = sortBy.ToLower() switch
                 {
-                   "name" => isDescending ? villaQuery.OrderByDescending(x => x.Name) : villaQuery.OrderBy(x => x.Name),
-                   "rate" => isDescending ? villaQuery.OrderByDescending(x => x.Rate) : villaQuery.OrderBy(x => x.Rate),
-                   "occupancy" => isDescending ? villaQuery.OrderByDescending(x => x.Occupancy) : villaQuery.OrderBy(x => x.Occupancy),
-                   "sqft" => isDescending ? villaQuery.OrderByDescending(x => x.Sqft) : villaQuery.OrderBy(x => x.Sqft),
-                   "id" => isDescending ? villaQuery.OrderByDescending(x => x.Id) : villaQuery.OrderBy(x => x.Id),
-                   _ => villaQuery.OrderBy(x => x.Id)
+                    "name" => isDescending ? villaQuery.OrderByDescending(x => x.Name) : villaQuery.OrderBy(x => x.Name),
+                    "rate" => isDescending ? villaQuery.OrderByDescending(x => x.Rate) : villaQuery.OrderBy(x => x.Rate),
+                    "occupancy" => isDescending ? villaQuery.OrderByDescending(x => x.Occupancy) : villaQuery.OrderBy(x => x.Occupancy),
+                    "sqft" => isDescending ? villaQuery.OrderByDescending(x => x.Sqft) : villaQuery.OrderBy(x => x.Sqft),
+                    "id" => isDescending ? villaQuery.OrderByDescending(x => x.Id) : villaQuery.OrderBy(x => x.Id),
+                    _ => villaQuery.OrderBy(x => x.Id)
                 };
             }
             else
             {
-                villaQuery.OrderBy(x => x.Name);
+                villaQuery = villaQuery.OrderBy(x => x.Name);
             }
 
             var skip = (page - 1) * pageSize;
@@ -125,9 +125,14 @@ namespace RoyalVilla_API.Controllers.v2
 
             var dtoResponseVilla = _mapper.Map<List<VillaDTO>>(villa);
 
+
+            //
             var messageBuilder = new StringBuilder();
             messageBuilder.Append($"Successfully retrived {dtoResponseVilla.Count} ");
             messageBuilder.Append($"page {page} of {totalPages}, {totalCount} total records");
+            _logger.LogInformation($"Villa details retrieved successfully. Page: {page}, PageSize: {pageSize}, TotalCount: {totalCount}, TotalPages: {totalPages}");
+            //
+
 
             if (!string.IsNullOrEmpty(filterby) && !string.IsNullOrEmpty(filterQuery))
             {
@@ -135,7 +140,7 @@ namespace RoyalVilla_API.Controllers.v2
             }
             if (!string.IsNullOrEmpty(sortOrder))
             {
-                messageBuilder.Append($" Sorted by {sortBy}: '{sortOrder?.ToLower()?? "asc" }'");
+                messageBuilder.Append($" Sorted by {sortBy}: '{sortOrder?.ToLower() ?? "asc"}'");
             }
 
             //professional approach
@@ -157,41 +162,31 @@ namespace RoyalVilla_API.Controllers.v2
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ApiResponse<VillaDTO>>> getVillaById(int id)
         {
-            try
+            if (id < 0)
             {
-                if (id < 0)
-                {
-                    return BadRequest(ApiResponse<VillaDTO>.BadRequest("Bad Request", "Enter the Id greter than 0"));
+                return BadRequest(ApiResponse<VillaDTO>.BadRequest("Bad Request", "Enter the Id greter than 0"));
 
-                    //return new ApiResponse<VillaDTO>
-                    //{
-                    //    Success = false,
-                    //    StatusCode = 400,
-                    //    Message = "Bad Request",
-                    //    Errors = "Enter a Id greater than O",
-                    //    Data = null //or _mapper.Map<VillaDTO>(Villa) for success
-                    //};
-                    //return BadRequest("Enter a Id greater than O");
-                }
-
-                var Villa = await _db.Villa.FirstOrDefaultAsync(x => x.Id == id);
-
-                if (id == null)
-                {
-                    return NotFound(ApiResponse<object>.NotFound($"Villa with ID {id} is not found"));
-                }
-                var response = ApiResponse<VillaDTO>.Ok(_mapper.Map<VillaDTO>(Villa), "Retrived successfully");
-                
-                _logger.LogInformation("Villa details retrieved successfully for ID '{Id}'.", id);
-                return Ok(response);
+                //return new ApiResponse<VillaDTO>
+                //{
+                //    Success = false,
+                //    StatusCode = 400,
+                //    Message = "Bad Request",
+                //    Errors = "Enter a Id greater than O",
+                //    Data = null //or _mapper.Map<VillaDTO>(Villa) for success
+                //};
+                //return BadRequest("Enter a Id greater than O");
             }
-            catch (Exception ex)
+
+            var Villa = await _db.Villa.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (id == null)
             {
-                
-                var errorResponse = ApiResponse<object>.Error(500, $"An error occured while retriving the id {id}", ex.Message);
-                _logger.LogError($"An error occured while retriving the id {id}: {ex.Message}");
-                return StatusCode(500, errorResponse);
+                return NotFound(ApiResponse<object>.NotFound($"Villa with ID {id} is not found"));
             }
+            var response = ApiResponse<VillaDTO>.Ok(_mapper.Map<VillaDTO>(Villa), "Retrived successfully");
+
+            _logger.LogInformation("Villa details retrieved successfully for ID '{Id}'.", id);
+            return Ok(response);
         }
 
         //[HttpGet("{id:int}/{name}")]
@@ -206,7 +201,7 @@ namespace RoyalVilla_API.Controllers.v2
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status502BadGateway)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<ApiResponse<VillaDTO>>> CreateVilla([FromForm]VillaCreateDTO villaDTO)
+        public async Task<ActionResult<ApiResponse<VillaDTO>>> CreateVilla([FromForm] VillaCreateDTO villaDTO)
         {
             try
             {
@@ -272,10 +267,9 @@ namespace RoyalVilla_API.Controllers.v2
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status502BadGateway)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status409Conflict)]
-        public async Task<ActionResult<ApiResponse<VillaDTO>>> UpdateVilla(int id, [FromForm]VillaUpdateDTO villaUpdateDTO)
+        public async Task<ActionResult<ApiResponse<VillaDTO>>> UpdateVilla(int id, [FromForm] VillaUpdateDTO villaUpdateDTO)
         {
-            try
-            {
+
                 if (villaUpdateDTO == null)
                 {
                     _logger.LogError("Villa data is required for update.");
@@ -310,12 +304,12 @@ namespace RoyalVilla_API.Controllers.v2
 
                 var OldImageUrl = existingVilla.ImageUrl;
 
-                if(villaUpdateDTO.Image != null)
+                if (villaUpdateDTO.Image != null)
                 {
                     existingVilla.ImageUrl = await _imageService.UploadImageAsync(villaUpdateDTO.Image);
-                    villaUpdateDTO.ImageUrl = existingVilla.ImageUrl;   
+                    villaUpdateDTO.ImageUrl = existingVilla.ImageUrl;
 
-                    if (!string.IsNullOrEmpty(OldImageUrl) && OldImageUrl != existingVilla.ImageUrl) 
+                    if (!string.IsNullOrEmpty(OldImageUrl) && OldImageUrl != existingVilla.ImageUrl)
                     {
                         await _imageService.DeleteImageAsync(OldImageUrl);
                     }
@@ -329,13 +323,6 @@ namespace RoyalVilla_API.Controllers.v2
                 var response = ApiResponse<VillaDTO>.Ok(_mapper.Map<VillaDTO>(existingVilla), "Villa updated successfully");
                 _logger.LogInformation("Villa updated successfully with ID '{Id}'.", existingVilla.Id);
                 return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"An error occurred while updating a Villa: {ex.Message}");
-                var errorResponse = ApiResponse<object>.Error(500, $"An error occurred while updating a Villa", ex.Message);
-                return StatusCode(500, errorResponse);
-            }
         }
 
         [HttpDelete("{id:int}")]
@@ -356,10 +343,10 @@ namespace RoyalVilla_API.Controllers.v2
                 }
 
 
-                    if (!string.IsNullOrEmpty(existingVilla.ImageUrl))
-                    {
-                        await _imageService.DeleteImageAsync(existingVilla.ImageUrl);
-                    }
+                if (!string.IsNullOrEmpty(existingVilla.ImageUrl))
+                {
+                    await _imageService.DeleteImageAsync(existingVilla.ImageUrl);
+                }
 
                 _db.Villa.Remove(existingVilla);
 

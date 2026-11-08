@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using RoyalVilla.DTO;
 using RoyalVillaWeb.Models;
 using RoyalVillaWeb.Services.IService;
+using RoyalVillaWeb.ViewModels;
 using System.Diagnostics;
 
 namespace RoyalVillaWeb.Controllers
@@ -19,16 +20,23 @@ namespace RoyalVillaWeb.Controllers
         }
 
         //[Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(VillaQueryParameters parameters)
         {
-            List<VillaDTO> villaList = new();
 
             try
             {
-                var response = await _villaService.GetAllAsync<ApiResponse<List<VillaDTO>>>();
-                if (response!=null && response.Success && response.Data !=null)
+                var response = await _villaService.GetAllAsync<ApiResponse<List<VillaDTO>>>(parameters);
+                if (response != null && response.Success && response.Data != null)
                 {
-                    villaList = response.Data;
+                    int Header(string name) =>
+    int.TryParse(Response.Headers[name].FirstOrDefault(), out var v) ? v : 0;
+                    var villas = new VillaPageObjects
+                    {
+                        villas = response.Data,
+                        villaQuery = parameters,
+                        Pagination = response.Pagination
+                    };
+                    return View(villas);
                 }
             }
             catch (Exception ex)
@@ -36,7 +44,8 @@ namespace RoyalVillaWeb.Controllers
                 TempData["error"] = $"An error occured {ex.Message} ";
             }
 
-            return View(villaList);
+
+            return View(new VillaPageObjects());
         }
 
         public IActionResult Privacy()

@@ -1,7 +1,9 @@
-﻿using RoyalVilla.DTO;
+﻿using Microsoft.AspNetCore.WebUtilities;
+using RoyalVilla.DTO;
 using RoyalVillaWeb.Extension;
 using RoyalVillaWeb.Models;
 using RoyalVillaWeb.Services.IService;
+using RoyalVillaWeb.ViewModels;
 
 namespace RoyalVillaWeb.Services
 {
@@ -36,13 +38,25 @@ namespace RoyalVillaWeb.Services
             });
         }
 
-        public Task<T?> GetAllAsync<T>()
+        public Task<T?> GetAllAsync<T>(VillaQueryParameters parameters)
         {
+
+            var queryparam = new Dictionary<string, string?>()
+            {
+                { "page", parameters.Page.ToString() },
+                { "pageSize", parameters.PageSize.ToString() },
+                { "filterBy", parameters.FilterBy },
+                { "filterQuery", parameters.FilterQuery },
+                { "sortBy", parameters.SortBy },
+                { "sortOrder", parameters.SortOrder }
+            };
+
+            var url = QueryHelpers.AddQueryString(APIEndpoint, queryparam);
+
             return SendAsync<T>(new ApiRequest
             {
                 ApiType = SD.ApiType.GET,
-                Url = APIEndpoint
-
+                Url = url
             });
         }
 

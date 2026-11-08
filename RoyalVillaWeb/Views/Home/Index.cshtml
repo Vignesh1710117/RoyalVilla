@@ -1,614 +1,182 @@
-﻿
-@using RoyalVilla.DTO
+﻿@using RoyalVilla.DTO
 @using RoyalVillaWeb
-@model IEnumerable<VillaDTO>
+@using RoyalVillaWeb.ViewModels
+@model RoyalVillaWeb.ViewModels.VillaPageObjects
 
 @{
     ViewData["Title"] = "Discover Luxury Villas";
-    var villas = Model?.ToList() ?? new List<VillaDTO>();
+    var villas = Model?.villas ?? new List<VillaDTO>();
+    var query = Model?.villaQuery ?? new RoyalVillaWeb.ViewModels.VillaQueryParameters();
+    var pg = Model?.Pagination;
+    if (pg == null || (pg.TotalCount == 0 && villas.Any()))
+    {
+        // Headers missing: fall back to what we have so the page still renders
+        pg = new PaginationInfo { CurrentPage = 1, PageSize = villas.Count, TotalCount = villas.Count, TotalPages = 1 };
+    }
+    var firstItem = pg.TotalCount == 0 ? 0 : ((pg.CurrentPage - 1) * pg.PageSize) + 1;
+    var lastItem = villas.Any() ? firstItem + villas.Count - 1 : 0;
+    var shownCount = ((pg.CurrentPage - 1) * pg.PageSize) + villas.Count;
+    var remaining = Math.Max(0, pg.TotalCount - shownCount);
+    var nextBatch = Math.Min(pg.PageSize, remaining);
+
+    var slides = new[]
+    {
+        (Css: "",          Icon: "bi-stars",          Tag: "Welcome to RoyalVilla",  Title: "Find Your Own<br />Piece of Paradise",
+         Text: "Discover thoughtfully selected villas where comfort, privacy and unforgettable experiences come together."),
+        (Css: "slide-two", Icon: "bi-gem",            Tag: "Comfort meets elegance", Title: "A Stay Worth<br />Remembering",
+         Text: "Enjoy the space, amenities and comfort you need to make every getaway feel special."),
+        (Css: "slide-three", Icon: "bi-calendar-heart", Tag: "Your next getaway",    Title: "Make Room for<br />Beautiful Memories",
+         Text: "Explore our available properties and find the right villa for your next escape.")
+    };
 }
-
-<style>
-    :root {
-        --rv-green: #294b37;
-        --rv-green-dark: #1e3829;
-        --rv-green-light: #e9f0e7;
-        --rv-cream: #f7f7f1;
-        --rv-text: #29392e;
-        --rv-muted: #7c877d;
-        --rv-border: #e7ebe3;
-    }
-
-    .rv-home {
-        background: var(--rv-cream);
-        color: var(--rv-text);
-        min-height: 100vh;
-        padding-bottom: 40px;
-    }
-
-    /* Hero carousel */
-    .rv-hero {
-        position: relative;
-        overflow: hidden;
-        background: var(--rv-green-dark);
-    }
-
-    .rv-hero .carousel-slide {
-        min-height: 490px;
-        padding: 70px 22px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        isolation: isolate;
-    }
-
-    .rv-hero .carousel-slide::before,
-    .rv-hero .carousel-slide::after {
-        content: "";
-        position: absolute;
-        pointer-events: none;
-        z-index: -1;
-    }
-
-    .rv-hero .carousel-slide::before {
-        inset: 0;
-        background:
-            radial-gradient(ellipse at 15% 15%, rgba(210, 222, 182, .18), transparent 45%),
-            linear-gradient(120deg, #172e21, #31563d 58%, #667958);
-    }
-
-    .rv-hero .slide-two::before {
-        background:
-            radial-gradient(ellipse at 80% 25%, rgba(229, 213, 166, .25), transparent 40%),
-            linear-gradient(120deg, #263d2d, #587052 60%, #879176);
-    }
-
-    .rv-hero .slide-three::before {
-        background:
-            radial-gradient(ellipse at 25% 75%, rgba(205, 219, 183, .2), transparent 42%),
-            linear-gradient(120deg, #1a3023, #355640 55%, #7b8465);
-    }
-
-    .rv-hero .carousel-slide::after {
-        width: 390px;
-        height: 390px;
-        border: 1px solid rgba(255, 255, 255, .13);
-        border-radius: 50%;
-        right: -90px;
-        top: -145px;
-        box-shadow: 0 0 0 35px rgba(255,255,255,.025),
-                    0 0 0 75px rgba(255,255,255,.02);
-    }
-
-    .rv-hero-content {
-        width: 100%;
-        max-width: 850px;
-        text-align: center;
-        color: white;
-        padding: 20px;
-    }
-
-    .rv-hero-eyebrow {
-        display: inline-block;
-        border: 1px solid rgba(255,255,255,.35);
-        border-radius: 50px;
-        padding: 8px 17px;
-        margin-bottom: 24px;
-        color: #e6ebd9;
-        font-size: .73rem;
-        font-weight: 700;
-        letter-spacing: 2px;
-    }
-
-    .rv-hero-content h1 {
-        font-size: clamp(2.25rem, 5vw, 4.1rem);
-        font-weight: 750;
-        line-height: 1.12;
-        letter-spacing: -1.5px;
-        margin-bottom: 22px;
-    }
-
-    .rv-hero-content p {
-        max-width: 620px;
-        margin: 0 auto 30px;
-        color: rgba(255,255,255,.83);
-        font-size: clamp(1rem, 2vw, 1.2rem);
-        line-height: 1.8;
-    }
-
-    .rv-hero-btn {
-        background: #f4f1e5;
-        color: var(--rv-green-dark);
-        border: 1px solid #f4f1e5;
-        border-radius: 9px;
-        padding: 13px 25px;
-        font-weight: 700;
-        transition: .25s ease;
-    }
-
-    .rv-hero-btn:hover {
-        background: white;
-        border-color: white;
-        color: var(--rv-green-dark);
-        transform: translateY(-2px);
-    }
-
-    .rv-hero .carousel-indicators {
-        margin-bottom: 24px;
-    }
-
-    .rv-hero .carousel-indicators [data-bs-target] {
-        width: 25px;
-        height: 4px;
-        border: 0;
-        border-radius: 8px;
-    }
-
-    .rv-hero .carousel-control-prev,
-    .rv-hero .carousel-control-next {
-        width: 8%;
-    }
-
-    .rv-hero .carousel-control-prev-icon,
-    .rv-hero .carousel-control-next-icon {
-        background-color: rgba(255,255,255,.16);
-        border: 1px solid rgba(255,255,255,.25);
-        border-radius: 50%;
-        width: 45px;
-        height: 45px;
-        background-size: 45%;
-    }
-
-    /* Search-style intro strip */
-    .rv-intro-strip {
-        max-width: 1100px;
-        margin: -1px auto 0;
-        padding: 23px 25px;
-        background: #fff;
-        border: 1px solid var(--rv-border);
-        border-radius: 0 0 17px 17px;
-        box-shadow: 0 8px 25px rgba(36, 58, 42, .035);
-    }
-
-    .rv-intro-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        justify-content: center;
-    }
-
-    .rv-intro-icon {
-        width: 43px;
-        height: 43px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--rv-green-light);
-        color: var(--rv-green);
-        border-radius: 12px;
-        font-size: 1.2rem;
-        flex-shrink: 0;
-    }
-
-    .rv-intro-item strong {
-        display: block;
-        font-size: .9rem;
-    }
-
-    .rv-intro-item small {
-        color: var(--rv-muted);
-        font-size: .78rem;
-    }
-
-    /* Listings */
-    .rv-listings {
-        padding-top: 75px;
-    }
-
-    .rv-eyebrow {
-        color: #71846e;
-        font-size: .72rem;
-        font-weight: 750;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }
-
-    .rv-section-title {
-        color: var(--rv-green-dark);
-        font-size: clamp(1.9rem, 4vw, 2.7rem);
-        font-weight: 750;
-        letter-spacing: -1px;
-    }
-
-    .rv-section-subtitle {
-        color: var(--rv-muted);
-        max-width: 580px;
-        margin: 0 auto;
-        line-height: 1.8;
-    }
-
-    .rv-listing-count {
-        color: var(--rv-green);
-        background: var(--rv-green-light);
-        border-radius: 30px;
-        padding: 8px 14px;
-        font-size: .8rem;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-
-    /* Villa cards */
-    .rv-villa-card {
-        height: 100%;
-        background: white;
-        border: 1px solid var(--rv-border);
-        border-radius: 17px;
-        overflow: hidden;
-        box-shadow: 0 5px 20px rgba(33, 55, 38, .035);
-        transition: transform .3s ease, box-shadow .3s ease;
-    }
-
-    .rv-villa-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 18px 40px rgba(33, 55, 38, .11);
-    }
-
-    .rv-villa-image-wrap {
-        height: 245px;
-        position: relative;
-        overflow: hidden;
-        background: #e7ece3;
-    }
-
-    .rv-villa-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform .55s ease;
-    }
-
-    .rv-villa-card:hover .rv-villa-image {
-        transform: scale(1.055);
-    }
-
-    .rv-image-placeholder {
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #718671;
-        font-size: 3rem;
-        background: linear-gradient(135deg, #edf1e7, #dbe5d6);
-    }
-
-    .rv-price-badge {
-        position: absolute;
-        right: 14px;
-        top: 14px;
-        background: rgba(255,255,255,.96);
-        color: var(--rv-green-dark);
-        border-radius: 9px;
-        padding: 9px 13px;
-        font-size: .84rem;
-        font-weight: 750;
-        box-shadow: 0 4px 12px rgba(0,0,0,.08);
-    }
-
-    .rv-villa-card-body {
-        padding: 23px;
-        display: flex;
-        flex-direction: column;
-        min-height: 285px;
-    }
-
-    .rv-villa-name {
-        color: var(--rv-green-dark);
-        font-size: 1.2rem;
-        font-weight: 750;
-        margin-bottom: 11px;
-    }
-
-    .rv-villa-description {
-        color: var(--rv-muted);
-        font-size: .9rem;
-        line-height: 1.75;
-        display: -webkit-box;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-        min-height: 72px;
-        margin-bottom: 19px;
-    }
-
-    .rv-villa-features {
-        display: flex;
-        gap: 17px;
-        flex-wrap: wrap;
-        padding: 14px 0;
-        margin-top: auto;
-        border-top: 1px solid #edf0eb;
-        color: #647267;
-        font-size: .82rem;
-    }
-
-    .rv-villa-features i {
-        color: #65806a;
-        margin-right: 5px;
-    }
-
-    .rv-details-btn {
-        background: var(--rv-green);
-        color: white;
-        border: 1px solid var(--rv-green);
-        border-radius: 9px;
-        padding: 11px 15px;
-        font-weight: 650;
-        transition: .2s ease;
-    }
-
-    .rv-details-btn:hover {
-        background: var(--rv-green-dark);
-        color: white;
-        border-color: var(--rv-green-dark);
-    }
-
-    .rv-contact-btn {
-        background: white;
-        color: var(--rv-green);
-        border: 1px solid #dce5d9;
-        border-radius: 9px;
-        padding: 10px 15px;
-        font-weight: 650;
-    }
-
-    .rv-contact-btn:hover {
-        background: var(--rv-green-light);
-        color: var(--rv-green-dark);
-    }
-
-    /* Empty state and alerts */
-    .rv-empty-state {
-        background: white;
-        border: 1px dashed #d5dfd2;
-        border-radius: 18px;
-        padding: 55px 20px;
-        text-align: center;
-    }
-
-    .rv-empty-icon {
-        width: 75px;
-        height: 75px;
-        margin: 0 auto 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        background: var(--rv-green-light);
-        color: var(--rv-green);
-        font-size: 2rem;
-    }
-
-    .rv-alert {
-        border: 0;
-        border-radius: 12px;
-    }
-
-    /* Statistics */
-    .rv-stats {
-        background: white;
-        border: 1px solid var(--rv-border);
-        border-radius: 18px;
-        padding: 35px 24px;
-        box-shadow: 0 8px 25px rgba(36, 58, 42, .04);
-    }
-
-    .rv-stat-item {
-        padding: 12px;
-        height: 100%;
-    }
-
-    .rv-stat-icon {
-        width: 53px;
-        height: 53px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 15px;
-        border-radius: 15px;
-        background: var(--rv-green-light);
-        color: var(--rv-green);
-        font-size: 1.45rem;
-    }
-
-    .rv-stat-value {
-        color: var(--rv-green-dark);
-        font-size: clamp(1.45rem, 3vw, 2rem);
-        font-weight: 750;
-        overflow-wrap: anywhere;
-    }
-
-    .rv-stat-label {
-        color: var(--rv-muted);
-        font-size: .85rem;
-        margin: 0;
-    }
-
-    .rv-bottom-note {
-        color: #8a9488;
-        font-size: .82rem;
-    }
-
-    @@media (max-width: 767.98px) {
-        .rv-hero .carousel-slide {
-            min-height: 410px;
-            padding: 55px 20px;
-        }
-
-        .rv-hero .carousel-control-prev,
-        .rv-hero .carousel-control-next {
-            width: 10%;
-        }
-
-        .rv-intro-strip {
-            margin: 0 12px;
-            border-radius: 0 0 15px 15px;
-        }
-
-        .rv-intro-item {
-            justify-content: flex-start;
-            padding: 8px 0;
-        }
-
-        .rv-listings {
-            padding-top: 50px;
-        }
-
-        .rv-villa-image-wrap {
-            height: 230px;
-        }
-    }
-
-    @@media (prefers-reduced-motion: reduce) {
-        .rv-villa-card,
-        .rv-villa-image,
-        .rv-details-btn,
-        .rv-hero-btn {
-            transition: none;
-        }
-    }
-</style>
 
 <div class="rv-home">
 
     <!-- Hero carousel -->
-    <section class="rv-hero">
-        <div id="heroCarousel"
-             class="carousel slide carousel-fade"
-             data-bs-ride="carousel"
-             data-bs-interval="5000">
+    <section class="rv-hero" aria-label="Featured">
+        <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel" data-bs-interval="6000">
 
             <div class="carousel-indicators">
-                <button type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide-to="0" class="active"
-                        aria-current="true" aria-label="Slide 1"></button>
-                <button type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide-to="1" aria-label="Slide 2"></button>
-                <button type="button" data-bs-target="#heroCarousel"
-                        data-bs-slide-to="2" aria-label="Slide 3"></button>
+                @for (var i = 0; i < slides.Length; i++)
+                {
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="@i"
+                            class="@(i == 0 ? "active" : "")"
+                            aria-current="@(i == 0 ? "true" : "false")"
+                            aria-label="Slide @(i + 1)"></button>
+                }
             </div>
 
             <div class="carousel-inner">
-                <div class="carousel-item active">
-                    <div class="carousel-slide">
-                        <div class="rv-hero-content">
-                            <span class="rv-hero-eyebrow">
-                                <i class="bi bi-stars me-2"></i>WELCOME TO ROYALVILLA
-                            </span>
-                            <h1>Find Your Own<br />Piece of Paradise</h1>
-                            <p>
-                                Discover thoughtfully selected villas where
-                                comfort, privacy and unforgettable experiences
-                                come together.
-                            </p>
-                            <a href="#villa-listings" class="btn rv-hero-btn">
-                                Explore Our Villas
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                @for (var i = 0; i < slides.Length; i++)
+                {
+                    var s = slides[i];
+                    <div class="carousel-item @(i == 0 ? "active" : "")">
+                        <div class="carousel-slide @s.Css">
+                            <div class="rv-hero-content">
+                                <span class="rv-hero-eyebrow"><i class="bi @s.Icon me-2"></i>@s.Tag</span>
+                                @if (i == 0)
+                                {
+                                    <h1>@Html.Raw(s.Title)</h1>
+                                }
+                                else
+                                {
 
-                <div class="carousel-item">
-                    <div class="carousel-slide slide-two">
-                        <div class="rv-hero-content">
-                            <span class="rv-hero-eyebrow">
-                                <i class="bi bi-gem me-2"></i>COMFORT MEETS ELEGANCE
-                            </span>
-                            <h1>A Stay Worth<br />Remembering</h1>
-                            <p>
-                                Enjoy the space, amenities and comfort you need
-                                to make every getaway feel special.
-                            </p>
-                            <a href="#villa-listings" class="btn rv-hero-btn">
-                                Discover the Collection
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
+                                    <h2 class="h1 rv-hero-heading">@Html.Raw(s.Title)</h2>
+                                }
+                                <p>@s.Text</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="carousel-item">
-                    <div class="carousel-slide slide-three">
-                        <div class="rv-hero-content">
-                            <span class="rv-hero-eyebrow">
-                                <i class="bi bi-calendar-heart me-2"></i>YOUR NEXT GETAWAY
-                            </span>
-                            <h1>Make Room for<br />Beautiful Memories</h1>
-                            <p>
-                                Explore our available properties and find
-                                the right villa for your next escape.
-                            </p>
-                            <a href="#villa-listings" class="btn rv-hero-btn">
-                                Find Your Villa
-                                <i class="bi bi-arrow-right ms-2"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+                }
             </div>
 
-            <button class="carousel-control-prev" type="button"
-                    data-bs-target="#heroCarousel" data-bs-slide="prev"
-                    aria-label="Previous slide">
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev" aria-label="Previous slide">
                 <span class="carousel-control-prev-icon" aria-hidden="true"></span>
             </button>
-
-            <button class="carousel-control-next" type="button"
-                    data-bs-target="#heroCarousel" data-bs-slide="next"
-                    aria-label="Next slide">
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next" aria-label="Next slide">
                 <span class="carousel-control-next-icon" aria-hidden="true"></span>
             </button>
         </div>
     </section>
 
+    <!-- One shared search panel for every slide -->
+    <div class="rv-search-wrap">
+        <div class="rv-search-shell" id="rvSearchBox">
+            <div class="rv-search-tabs" role="tablist" aria-label="Villa search options">
+                <button type="button" class="rv-search-tab active" data-mode="search" role="tab" aria-selected="true">
+                    <i class="bi bi-search"></i>Search
+                </button>
+                <button type="button" class="rv-search-tab" data-mode="filters" role="tab" aria-selected="false">
+                    <i class="bi bi-sliders"></i>Filters
+                </button>
+            </div>
+
+            <form asp-controller="Home" asp-action="Index" method="get" id="rvSearchForm">
+                <input type="hidden" name="Page" value="1" />
+                <input type="hidden" name="PageSize" value="@query.PageSize" />
+
+                <div id="rvSearchPanel" data-panel="search">
+                    <div class="rv-search-input-row">
+                        <label class="rv-search-input-wrap">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <input type="text" name="FilterQuery" value="@query.FilterQuery"
+                                   class="rv-search-input" placeholder="Search villas by name"
+                                   aria-label="Search villas by name" />
+                        </label>
+                        <input type="hidden" name="FilterBy" value="name" />
+                        <button type="submit" class="rv-search-submit">Search villas</button>
+                    </div>
+                    <div class="rv-search-help">Search our collection by property name.</div>
+                </div>
+
+                <div id="rvFilterPanel" class="rv-filter-panel" data-panel="filters" hidden>
+                    <div class="rv-filter-grid">
+                        <div class="rv-filter-field">
+                            <label for="rvFilterBy">Filter by</label>
+                            <select id="rvFilterBy" name="FilterBy" class="form-select" disabled>
+                                <option value="name" selected="@(query.FilterBy == "name")">Villa name</option>
+                                <option value="details" selected="@(query.FilterBy == "details")">Details</option>
+                                <option value="rate" selected="@(query.FilterBy == "rate")">Exact rate</option>
+                                <option value="minrate" selected="@(query.FilterBy == "minrate")">Minimum rate</option>
+                                <option value="maxrate" selected="@(query.FilterBy == "maxrate")">Maximum rate</option>
+                                <option value="occupancy" selected="@(query.FilterBy == "occupancy")">Occupancy</option>
+                                <option value="sqft" selected="@(query.FilterBy == "sqft")">Square feet</option>
+                            </select>
+                        </div>
+
+                        <div class="rv-filter-field">
+                            <label for="rvFilterValue">Filter value</label>
+                            <input id="rvFilterValue" type="text" name="FilterQuery" value="@query.FilterQuery"
+                                   class="form-control" placeholder="Enter a value" disabled />
+                        </div>
+
+                        <div class="rv-filter-field rv-sort-field">
+                            <label for="rvSort">Sort results</label>
+                            <select id="rvSort" class="form-select">
+                                <option value="">Recommended</option>
+                                <option value="rate|asc">Price: low to high</option>
+                                <option value="rate|desc">Price: high to low</option>
+                                <option value="name|asc">Villa name: A to Z</option>
+                                <option value="name|desc">Villa name: Z to A</option>
+                                <option value="occupancy|desc">Guest capacity: highest</option>
+                                <option value="occupancy|asc">Guest capacity: lowest</option>
+                                <option value="sqft|desc">Area: largest first</option>
+                                <option value="sqft|asc">Area: smallest first</option>
+                            </select>
+                            <input type="hidden" name="SortBy" id="rvSortBy" value="@query.SortBy" disabled />
+                            <input type="hidden" name="SortOrder" id="rvSortOrder" value="@query.SortOrder" disabled />
+                        </div>
+                    </div>
+
+                    <div class="rv-filter-actions">
+                        <a asp-controller="Home" asp-action="Index" class="rv-filter-clear">Clear filters</a>
+                        <button type="submit" class="rv-search-submit">Apply filters</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Highlights -->
     <div class="container">
         <div class="rv-intro-strip">
-            <div class="row g-3">
+            <div class="row g-2">
                 <div class="col-md-4">
                     <div class="rv-intro-item">
-                        <div class="rv-intro-icon">
-                            <i class="bi bi-house-heart"></i>
-                        </div>
-                        <div>
-                            <strong>Handpicked Villas</strong>
-                            <small>Spaces for your perfect stay</small>
-                        </div>
+                        <div class="rv-intro-icon"><i class="bi bi-house-heart"></i></div>
+                        <div><strong>Handpicked villas</strong><small>Spaces for your perfect stay</small></div>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="rv-intro-item">
-                        <div class="rv-intro-icon">
-                            <i class="bi bi-people"></i>
-                        </div>
-                        <div>
-                            <strong>Room for Everyone</strong>
-                            <small>Find a villa that fits your group</small>
-                        </div>
+                        <div class="rv-intro-icon"><i class="bi bi-people"></i></div>
+                        <div><strong>Room for everyone</strong><small>Find a villa that fits your group</small></div>
                     </div>
                 </div>
-
                 <div class="col-md-4">
                     <div class="rv-intro-item">
-                        <div class="rv-intro-icon">
-                            <i class="bi bi-calendar-check"></i>
-                        </div>
-                        <div>
-                            <strong>Plan Your Stay</strong>
-                            <small>Explore properties and amenities</small>
-                        </div>
+                        <div class="rv-intro-icon"><i class="bi bi-calendar-check"></i></div>
+                        <div><strong>Plan your stay</strong><small>Explore properties and amenities</small></div>
                     </div>
                 </div>
             </div>
@@ -619,76 +187,56 @@
     <section class="container rv-listings" id="villa-listings">
 
         <div class="text-center mb-5">
-            <div class="rv-eyebrow mb-3">YOUR NEXT ESCAPE STARTS HERE</div>
-            <h2 class="rv-section-title mb-3">Explore Our Villas</h2>
+            <h2 class="rv-section-title mb-3">Explore our villas</h2>
             <p class="rv-section-subtitle">
-                Discover spaces designed for relaxation, comfort and
-                meaningful moments with the people who matter.
+                Spaces designed for relaxation, comfort and meaningful moments with the people who matter.
             </p>
             <div class="mt-4">
                 <span class="rv-listing-count">
-                    <i class="bi bi-house-door me-1"></i>
-                    @villas.Count @(villas.Count == 1 ? "property" : "properties")
+                    <i class="bi bi-house-door"></i>
+                    @pg.TotalCount @(pg.TotalCount == 1 ? "property" : "properties")
                 </span>
             </div>
         </div>
 
         @if (TempData["error"] != null)
         {
-            <div class="alert alert-danger alert-dismissible fade show rv-alert mb-4"
-                 role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                @TempData["error"]
-                <button type="button" class="btn-close"
-                        data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-danger alert-dismissible fade show rv-alert mb-4" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>@TempData["error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         }
 
         @if (!villas.Any())
         {
             <div class="rv-empty-state">
-                <div class="rv-empty-icon">
-                    <i class="bi bi-house"></i>
-                </div>
-                <h3 class="fw-bold mb-2">No Villas Available Yet</h3>
-                <p class="text-muted mb-0">
-                    Our collection is being updated. Please check back later.
-                </p>
+                <div class="rv-empty-icon"><i class="bi bi-house"></i></div>
+                <h3 class="fw-bold mb-2">No villas found</h3>
+                <p class="text-muted mb-3">Try a different search or clear your filters.</p>
+                <a asp-controller="Home" asp-action="Index" class="btn rv-details-btn">Show all villas</a>
             </div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="villaGrid">
                 @foreach (var villa in villas)
                 {
                     <div class="col">
                         <article class="rv-villa-card">
-
                             <div class="rv-villa-image-wrap">
                                 @if (!string.IsNullOrWhiteSpace(villa.ImageUrl))
                                 {
-                                    <img src="@SD.getImageURL(villa.ImageUrl)"
-                                         class="rv-villa-image"
-                                         alt="@villa.Name"
-                                         loading="lazy" />
+                                    <img src="@SD.getImageURL(villa.ImageUrl)" class="rv-villa-image" alt="@villa.Name" loading="lazy" />
                                 }
                                 else
                                 {
-                                    <div class="rv-image-placeholder">
-                                        <i class="bi bi-house-heart"></i>
-                                    </div>
+                                    <div class="rv-image-placeholder"><i class="bi bi-house-heart"></i></div>
                                 }
-
-                                <div class="rv-price-badge">
-                                    ₹@villa.Rate.ToString("N0")
-                                    <span class="fw-normal">/ night</span>
-                                </div>
+                                <div class="rv-price-badge">₹@villa.Rate.ToString("N0") <span>/ night</span></div>
                             </div>
 
                             <div class="rv-villa-card-body">
                                 <h3 class="rv-villa-name">@villa.Name</h3>
-
                                 <p class="rv-villa-description">
                                     @(string.IsNullOrWhiteSpace(villa.Details)
                                         ? "Discover this property and explore its features and amenities."
@@ -696,89 +244,70 @@
                                 </p>
 
                                 <div class="rv-villa-features">
-                                    <span>
-                                        <i class="bi bi-people-fill"></i>
-                                        @villa.Occupancy guests
-                                    </span>
-                                    <span>
-                                        <i class="bi bi-rulers"></i>
-                                        @villa.Sqft.ToString("N0") sq.ft.
-                                    </span>
+                                    <span><i class="bi bi-people-fill"></i>@villa.Occupancy guests</span>
+                                    <span><i class="bi bi-rulers"></i>@villa.Sqft.ToString("N0") sq.ft.</span>
                                 </div>
 
                                 <div class="d-grid gap-2 mt-2">
-                                    <a asp-controller="VillaAmenities"
-                                       asp-action="Details"
-                                       asp-route-id="@villa.Id"
-                                       class="btn rv-details-btn">
-                                        <i class="bi bi-arrow-up-right-square me-2"></i>
-                                        View Villa Details
+                                    <a asp-controller="VillaAmenities" asp-action="Details" asp-route-id="@villa.Id" class="btn rv-details-btn">
+                                        <i class="bi bi-arrow-up-right-square me-2"></i>View villa details
                                     </a>
-
-                                    <a href="mailto:vignesh@gmail.com"
-                                       class="btn rv-contact-btn">
-                                        <i class="bi bi-envelope me-2"></i>
-                                        Contact Us
+                                    <a href="mailto:vignesh@gmail.com" class="btn rv-contact-btn">
+                                        <i class="bi bi-envelope me-2"></i>Contact us
                                     </a>
                                 </div>
                             </div>
-
                         </article>
                     </div>
                 }
             </div>
 
-            <!-- Statistics -->
-            <section class="rv-stats mt-5">
-                <div class="text-center mb-4">
-                    <div class="rv-eyebrow mb-2">THE COLLECTION</div>
-                    <h3 class="rv-section-title fs-3 mb-0">RoyalVilla at a Glance</h3>
-                </div>
+            <div class="rv-loadmore">
+                @if (remaining > 0)
+                {
+                    <button type="button" id="rvLoadMoreBtn" class="rv-loadmore-btn"
+                            data-next="@(pg.CurrentPage + 1)" data-size="@pg.PageSize"
+                            data-total="@pg.TotalCount" data-shown="@shownCount">
+                        <span class="rv-loadmore-label">Load next @nextBatch</span>
+                    </button>
+                }
+                <p id="rvLoadMoreStatus" class="rv-loadmore-status" aria-live="polite">
+                    Displaying @shownCount of @pg.TotalCount
+                </p>
+            </div>
 
+            <!-- Statistics -->
+            <section class="rv-stats" aria-labelledby="rvStatsTitle">
+                <div class="text-center mb-4">
+                    <h3 class="rv-section-title mb-0" id="rvStatsTitle">RoyalVilla at a glance</h3>
+                </div>
                 <div class="row g-3 text-center">
                     <div class="col-6 col-lg-3">
                         <div class="rv-stat-item">
-                            <div class="rv-stat-icon">
-                                <i class="bi bi-houses"></i>
-                            </div>
-                            <div class="rv-stat-value">@villas.Count</div>
-                            <p class="rv-stat-label">Total Villas</p>
+                            <div class="rv-stat-icon"><i class="bi bi-houses"></i></div>
+                            <div class="rv-stat-value">@pg.TotalCount</div>
+                            <p class="rv-stat-label">Total villas</p>
                         </div>
                     </div>
-
                     <div class="col-6 col-lg-3">
                         <div class="rv-stat-item">
-                            <div class="rv-stat-icon">
-                                <i class="bi bi-currency-rupee"></i>
-                            </div>
-                            <div class="rv-stat-value">
-                                ₹@villas.Min(v => v.Rate).ToString("N0")
-                            </div>
-                            <p class="rv-stat-label">Starting Price / Night</p>
+                            <div class="rv-stat-icon"><i class="bi bi-currency-rupee"></i></div>
+                            <div class="rv-stat-value">₹@villas.Min(v => v.Rate).ToString("N0")</div>
+                            <p class="rv-stat-label">Starting price / night</p>
                         </div>
                     </div>
-
                     <div class="col-6 col-lg-3">
                         <div class="rv-stat-item">
-                            <div class="rv-stat-icon">
-                                <i class="bi bi-people"></i>
-                            </div>
-                            <div class="rv-stat-value">
-                                @villas.Max(v => v.Occupancy)
-                            </div>
-                            <p class="rv-stat-label">Largest Guest Capacity</p>
+                            <div class="rv-stat-icon"><i class="bi bi-people"></i></div>
+                            <div class="rv-stat-value">@villas.Max(v => v.Occupancy)</div>
+                            <p class="rv-stat-label">Largest guest capacity</p>
                         </div>
                     </div>
-
                     <div class="col-6 col-lg-3">
                         <div class="rv-stat-item">
-                            <div class="rv-stat-icon">
-                                <i class="bi bi-bounding-box"></i>
-                            </div>
-                            <div class="rv-stat-value">
-                                @villas.Sum(v => v.Sqft).ToString("N0")
-                            </div>
-                            <p class="rv-stat-label">Combined Sq. Ft.</p>
+                            <div class="rv-stat-icon"><i class="bi bi-bounding-box"></i></div>
+                            <div class="rv-stat-value">@villas.Sum(v => v.Sqft).ToString("N0")</div>
+                            <p class="rv-stat-label">Combined sq. ft.</p>
                         </div>
                     </div>
                 </div>
@@ -786,8 +315,97 @@
         }
 
         <div class="text-center mt-5 rv-bottom-note">
-            <i class="bi bi-leaf me-1"></i>
-            Find your comfort. Create your memories. Stay with RoyalVilla.
+            <i class="bi bi-leaf me-1"></i>Find your comfort. Create your memories. Stay with RoyalVilla.
         </div>
     </section>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const box = document.getElementById("rvSearchBox");
+            const tabs = box.querySelectorAll(".rv-search-tab");
+            const panels = box.querySelectorAll("[data-panel]");
+            const sortSelect = document.getElementById("rvSort");
+            const sortBy = document.getElementById("rvSortBy");
+            const sortOrder = document.getElementById("rvSortOrder");
+
+            function activate(mode) {
+                tabs.forEach(t => {
+                    const on = t.dataset.mode === mode;
+                    t.classList.toggle("active", on);
+                    t.setAttribute("aria-selected", on);
+                });
+                panels.forEach(p => {
+                    const hide = p.dataset.panel !== mode;
+                    p.hidden = hide;
+                    // disabled inputs are not submitted, so only the visible panel posts its values
+                    p.querySelectorAll("input, select").forEach(el => {
+                        if (el !== sortSelect) el.disabled = hide;
+                    });
+                });
+            }
+
+            tabs.forEach(t => t.addEventListener("click", () => activate(t.dataset.mode)));
+
+            sortSelect.value = sortBy.value && sortOrder.value ? sortBy.value + "|" + sortOrder.value : "";
+            sortSelect.addEventListener("change", () => {
+                const [by, order] = sortSelect.value.split("|");
+                sortBy.value = by || "";
+                sortOrder.value = order || "";
+            });
+
+            // Open on Filters tab when the page was loaded with a sort or non-name filter
+            const startInFilters = (sortBy.value && sortOrder.value) ||
+                ("@query.FilterBy" && "@query.FilterBy" !== "name" && "@query.FilterBy" !== "");
+            activate(startInFilters ? "filters" : "search");
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const btn = document.getElementById("rvLoadMoreBtn");
+            if (!btn) return;
+
+            const grid = document.getElementById("villaGrid");
+            const status = document.getElementById("rvLoadMoreStatus");
+            const label = btn.querySelector(".rv-loadmore-label");
+            const total = parseInt(btn.dataset.total, 10);
+            const size = parseInt(btn.dataset.size, 10);
+            let nextPage = parseInt(btn.dataset.next, 10);
+            let shown = parseInt(btn.dataset.shown, 10);
+
+            btn.addEventListener("click", async () => {
+                btn.disabled = true;
+                label.textContent = "Loading...";
+                try {
+                    // same URL as the current page, so search, filter and sort carry over
+                    const params = new URLSearchParams(window.location.search);
+                    params.set("Page", nextPage);
+                    params.set("PageSize", size);
+
+                    const res = await fetch(window.location.pathname + "?" + params.toString());
+                    if (!res.ok) throw new Error("Request failed");
+
+                    const doc = new DOMParser().parseFromString(await res.text(), "text/html");
+                    const cards = doc.querySelectorAll("#villaGrid > .col");
+                    cards.forEach(c => grid.appendChild(document.importNode(c, true)));
+
+                    shown += cards.length;
+                    nextPage++;
+                    status.textContent = "Displaying " + shown + " of " + total;
+
+                    if (cards.length === 0 || shown >= total) {
+                        btn.remove();
+                    } else {
+                        label.textContent = "Load next " + Math.min(size, total - shown);
+                        btn.disabled = false;
+                    }
+                } catch (e) {
+                    label.textContent = "Could not load. Try again";
+                    btn.disabled = false;
+                }
+            });
+        })();
+    </script>
+}
